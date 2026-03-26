@@ -79,7 +79,16 @@ select:focus{border-color:var(--accent)}
     </div>
   </div>
   <div class="card">
-    <div class="card-header"><div class="step">2</div><h2>Qiyinlik darajasi</h2><span class="badge req">majburiy</span></div>
+    <div class="card-header"><div class="step">2</div><h2>Test turi</h2><span class="badge opt">ixtiyoriy</span></div>
+    <div class="card-body">
+      <div class="btn-group">
+        <button class="tog-btn" id="listeningBtn" onclick="toggleListening(this)">🎧 Listening</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;font-family:'IBM Plex Mono',monospace;">Listening savol bo'lsa bosing. Oddiy text savol bo'lsa bosmasdan o'ting.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="step">3</div><h2>Qiyinlik darajasi</h2><span class="badge req">majburiy</span></div>
     <div class="card-body">
       <div class="btn-group" id="diffGroup">
         <button class="tog-btn" data-val="Very Easy" data-cls="active-ve" onclick="selectDiff(this)">🟢 Very Easy</button>
@@ -91,7 +100,7 @@ select:focus{border-color:var(--accent)}
     </div>
   </div>
   <div class="card">
-    <div class="card-header"><div class="step">3</div><h2>Savol maqsadi</h2><span class="badge opt">ixtiyoriy</span></div>
+    <div class="card-header"><div class="step">4</div><h2>Savol maqsadi</h2><span class="badge opt">ixtiyoriy</span></div>
     <div class="card-body">
       <div class="field-row">
         <textarea id="purposeText" placeholder="Masalan: So'z ma'nosini tushunish..."></textarea>
@@ -100,7 +109,7 @@ select:focus{border-color:var(--accent)}
     </div>
   </div>
   <div class="card">
-    <div class="card-header"><div class="step">4</div><h2>Savol</h2><span class="badge opt">ixtiyoriy</span></div>
+    <div class="card-header"><div class="step">5</div><h2>Savol</h2><span class="badge opt">ixtiyoriy</span></div>
     <div class="card-body">
       <div class="field-row">
         <textarea id="questionText" placeholder="Savol matnini yozing..."></textarea>
@@ -115,7 +124,7 @@ select:focus{border-color:var(--accent)}
     </div>
   </div>
   <div class="card">
-    <div class="card-header"><div class="step">5</div><h2>Variantlar</h2><span class="badge req">majburiy</span></div>
+    <div class="card-header"><div class="step">6</div><h2>Variantlar</h2><span class="badge req">majburiy</span></div>
     <div class="card-body">
       <div class="variants-grid">
         <div class="vcard" id="vcard0">
@@ -167,6 +176,7 @@ var db=firebase.firestore();
 var storage=firebase.storage();
 
 function selectSection(btn){document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});btn.classList.add('active-section')}
+function toggleListening(btn){btn.classList.toggle('active-section')}
 function selectDiff(btn){document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){b.classList.remove('active-ve','active-e','active-m','active-am','active-h')});btn.classList.add(btn.dataset.cls)}
 function markCorrect(idx){for(var i=0;i<4;i++)document.getElementById('vcard'+i).classList.remove('correct-selected');document.getElementById('vcard'+idx).classList.add('correct-selected')}
 function showName(input,targetId){if(input.files[0])document.getElementById(targetId).textContent='✅ '+input.files[0].name}
@@ -206,6 +216,7 @@ async function submitQuestion(){
     }
     await db.collection('questions').add({
       section:section.dataset.val,
+      testType:document.getElementById('listeningBtn').classList.contains('active-section')?'Listening':'Reading',
       difficulty:diff.dataset.val,
       purpose:document.getElementById('purposeText').value.trim()||null,
       purposeFontSize:parseInt(document.getElementById('purposeFS').value),
@@ -219,6 +230,7 @@ async function submitQuestion(){
     });
     showStatus('✅ Savol muvaffaqiyatli saqlandi!','success');
     document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});
+    document.getElementById('listeningBtn').classList.remove('active-section');
     document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){b.classList.remove('active-ve','active-e','active-m','active-am','active-h')});
     document.getElementById('purposeText').value='';
     document.getElementById('questionText').value='';
