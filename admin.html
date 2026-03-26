@@ -1,111 +1,246 @@
-<!DOCTYPE html><html lang="uz"><head><meta charset="UTF-8"/><title>Korean Test Admin</title>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-<script>
-firebase.initializeApp({apiKey:"AIzaSyAOgwoxezdtV89KTdapbVHqzYjjt61_Cfk",authDomain:"koreantestapp.firebaseapp.com",projectId:"koreantestapp",storageBucket:"koreantestapp.firebasestorage.app",messagingSenderId:"927061643427",appId:"1:927061643427:web:89338d7127243e38ed6f16"});
-var db=firebase.firestore(),storage=firebase.storage();
-function sel(cls,val,active){document.querySelectorAll('.'+cls).forEach(function(b){b.classList.remove('on')});document.querySelector('.'+cls+'[data-v="'+val+'"]').classList.add('on')}
-function showName(inp,id){if(inp.files[0])document.getElementById(id).textContent='✅ '+inp.files[0].name}
-function showImg(inp,id){if(inp.files[0]){var r=new FileReader();r.onload=function(e){var i=document.getElementById(id);i.src=e.target.result;i.style.display='block'};r.readAsDataURL(inp.files[0])}}
-function markCorrect(i){for(var j=0;j<4;j++)document.getElementById('vc'+j).style.borderColor=j==i?'#2ecc71':'#2a3045'}
-async function uploadFile(file,path){var ref=storage.ref(path);await ref.put(file);return await ref.getDownloadURL()}
-async function submitQuestion(){
-var btn=document.getElementById('sb');
-var sec=document.querySelector('.sb.on');
-var dif=document.querySelector('.db.on');
-var cor=document.querySelector('input[name="correct"]:checked');
-if(!sec){alert('Bolim tanlang!');return}
-if(!dif){alert('Qiyinlik tanlang!');return}
-if(!cor){alert('Togri javobni belgilang!');return}
-btn.textContent='Yuklanmoqda...';btn.disabled=true;
-try{
-var ts=Date.now();
-var qa=document.getElementById('qAudio').files[0];
-var qi=document.getElementById('qImg').files[0];
-var qaUrl=qa?await uploadFile(qa,'audio/'+ts+'_q_'+qa.name):null;
-var qiUrl=qi?await uploadFile(qi,'images/'+ts+'_q_'+qi.name):null;
-var opts=[];
-for(var i=0;i<4;i++){
-var t=document.getElementById('o'+i+'t').value.trim()||null;
-var fs=parseInt(document.getElementById('o'+i+'fs').value);
-var af=document.getElementById('o'+i+'a').files[0];
-var imf=document.getElementById('o'+i+'i').files[0];
-var au=af?await uploadFile(af,'audio/'+ts+'_o'+i+'_'+af.name):null;
-var iu=imf?await uploadFile(imf,'images/'+ts+'_o'+i+'_'+imf.name):null;
-opts.push({text:t,fontSize:fs,audioUrl:au,imageUrl:iu});
-}
-await db.collection('questions').add({
-section:sec.dataset.v,
-difficulty:dif.dataset.v,
-purpose:document.getElementById('pt').value.trim()||null,
-purposeFontSize:parseInt(document.getElementById('pfs').value),
-questionText:document.getElementById('qt').value.trim()||null,
-questionFontSize:parseInt(document.getElementById('qfs').value),
-questionAudioUrl:qaUrl,
-questionImageUrl:qiUrl,
-options:opts,
-correctIndex:parseInt(cor.value),
-createdAt:firebase.firestore.FieldValue.serverTimestamp()
-});
-alert('Savol saqlandi!');
-}catch(e){alert('Xato: '+e.message)}
-btn.textContent='Firebase ga yuborish';btn.disabled=false;
-}
-</script>
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Korean Test — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Sora:wght@400;600;800&display=swap" rel="stylesheet"/>
 <style>
+:root{--bg:#0d0f14;--surface:#161a23;--surface2:#1e2330;--border:#2a3045;--accent:#4f8ef7;--accent2:#7c5cfc;--green:#2ecc71;--red:#e74c3c;--yellow:#f1c40f;--text:#e8eaf0;--muted:#6b7280;--radius:10px}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0d0f14;color:#e8eaf0;font-family:sans-serif;padding-bottom:60px}
-h1{background:#161a23;border-bottom:1px solid #2a3045;padding:18px 24px;font-size:18px}
-.wrap{max-width:860px;margin:0 auto;padding:24px 20px;display:flex;flex-direction:column;gap:16px}
-.card{background:#161a23;border:1px solid #2a3045;border-radius:12px;overflow:hidden}
-.ch{background:#1e2330;border-bottom:1px solid #2a3045;padding:12px 18px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
-.cb{padding:16px 18px}
-.btn-g{display:flex;flex-wrap:wrap;gap:10px}
-.sb,.db{padding:9px 18px;border-radius:8px;border:1.5px solid #2a3045;background:#0d0f14;color:#6b7280;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
-.sb.on{background:linear-gradient(135deg,#4f8ef7,#7c5cfc);border-color:transparent;color:#fff}
-.db[data-v="Very Easy"].on{background:#27ae60;border-color:transparent;color:#fff}
-.db[data-v="Easy"].on{background:#2ecc71;border-color:transparent;color:#fff}
-.db[data-v="Medium"].on{background:#f1c40f;border-color:transparent;color:#000}
-.db[data-v="Hard"].on{background:#e74c3c;border-color:transparent;color:#fff}
-textarea{width:100%;background:#0d0f14;border:1.5px solid #2a3045;border-radius:8px;color:#e8eaf0;font-family:sans-serif;font-size:14px;padding:10px;resize:vertical;min-height:65px;outline:none}
-textarea:focus{border-color:#4f8ef7}
-select{background:#0d0f14;border:1.5px solid #2a3045;border-radius:8px;color:#e8eaf0;font-size:12px;padding:8px 10px;cursor:pointer;outline:none;flex-shrink:0}
-.fr{display:flex;gap:10px;align-items:flex-start}
-.ur{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-.ub{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;background:#1e2330;border:1.5px dashed #2a3045;border-radius:8px;color:#6b7280;font-size:12px;cursor:pointer;position:relative;overflow:hidden;transition:all 0.2s}
-.ub:hover{border-color:#4f8ef7;color:#4f8ef7}
-.ub input[type=file]{position:absolute;opacity:0;width:100%;height:100%;top:0;left:0;cursor:pointer}
-.fn{font-size:11px;color:#2ecc71;margin-top:4px}
-.ip{margin-top:6px;width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #2a3045;display:none}
-.vg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.vc{background:#0d0f14;border:1.5px solid #2a3045;border-radius:10px;padding:12px;transition:border-color 0.2s}
-.vh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.vn{font-size:11px;font-weight:800;color:#4f8ef7;background:rgba(79,142,247,0.1);padding:2px 10px;border-radius:20px;border:1px solid rgba(79,142,247,0.2)}
-.cl{display:flex;align-items:center;gap:5px;font-size:12px;color:#6b7280;cursor:pointer}
-.cl input{accent-color:#2ecc71;width:13px;height:13px}
-.vf{margin-bottom:8px}
-.vf label{font-size:11px;color:#6b7280;margin-bottom:4px;display:block}
-.sba{text-align:center;padding:8px 0}
-#sb{background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;border:none;padding:14px 44px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(79,142,247,0.3)}
-#sb:hover{transform:translateY(-2px)}
-#sb:disabled{opacity:0.6;cursor:not-allowed;transform:none}
-@media(max-width:600px){.vg{grid-template-columns:1fr}}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-height:100vh;padding-bottom:60px}
+header{background:#161a23;border-bottom:1px solid var(--border);padding:18px 30px;display:flex;align-items:center;gap:14px}
+header .logo{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+header h1{font-size:17px;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header span{margin-left:auto;font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;background:var(--surface2);padding:4px 10px;border-radius:20px;border:1px solid var(--border)}
+.container{max-width:860px;margin:0 auto;padding:28px 20px;display:flex;flex-direction:column;gap:18px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.card-header{padding:13px 20px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-header .step{width:24px;height:24px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.card-header h2{font-size:13px;font-weight:700}
+.badge{margin-left:auto;font-size:10px;font-family:'IBM Plex Mono',monospace;padding:2px 8px;border-radius:20px}
+.badge.req{color:var(--red);background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.2)}
+.badge.opt{color:var(--muted);background:var(--bg);border:1px solid var(--border)}
+.card-body{padding:16px 20px}
+.btn-group{display:flex;flex-wrap:wrap;gap:10px}
+.tog-btn{padding:9px 20px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.tog-btn:hover{border-color:var(--accent);color:var(--text)}
+.tog-btn.active-section{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff}
+.tog-btn.active-ve{background:#27ae60;border-color:transparent;color:#fff}
+.tog-btn.active-e{background:#2ecc71;border-color:transparent;color:#fff}
+.tog-btn.active-m{background:var(--yellow);border-color:transparent;color:#000}
+.tog-btn.active-am{background:#e67e22;border-color:transparent;color:#fff}
+.tog-btn.active-h{background:var(--red);border-color:transparent;color:#fff}
+textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;padding:10px 14px;resize:vertical;min-height:70px;outline:none;transition:border-color 0.2s}
+textarea:focus{border-color:var(--accent)}
+select{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;padding:8px 12px;cursor:pointer;outline:none;transition:border-color 0.2s;flex-shrink:0}
+select:focus{border-color:var(--accent)}
+.field-row{display:flex;gap:10px;align-items:flex-start}
+.upload-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.upload-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;background:var(--surface2);border:1.5px dashed var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.upload-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(79,142,247,0.05)}
+.upload-btn input[type="file"]{position:absolute;opacity:0;width:100%;height:100%;top:0;left:0;cursor:pointer}
+.fname{font-size:11px;color:var(--green);font-family:'IBM Plex Mono',monospace;margin-top:5px}
+.ipreview{margin-top:8px;width:90px;height:90px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);display:none}
+.variants-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.variants-grid{grid-template-columns:1fr}}
+.vcard{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:14px}
+.vcard.correct-selected{border-color:var(--green);background:rgba(46,204,113,0.04)}
+.vcard-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.vnum{font-size:11px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--accent);background:rgba(79,142,247,0.1);padding:3px 10px;border-radius:20px;border:1px solid rgba(79,142,247,0.2)}
+.correct-lbl{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'IBM Plex Mono',monospace}
+.correct-lbl input[type="radio"]{accent-color:var(--green);width:14px;height:14px;cursor:pointer}
+.vfield{margin-bottom:10px}
+.vfield label{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:5px;display:block}
+.submit-area{text-align:center;padding:10px 0}
+#submitBtn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:15px 48px;border-radius:12px;font-family:'Sora',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(79,142,247,0.3)}
+#submitBtn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(79,142,247,0.4)}
+#submitBtn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.status-msg{display:none;margin-top:14px;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600}
+.status-msg.success{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--green)}
+.status-msg.error{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:var(--red)}
 </style>
 </head>
 <body>
-<h1>🇰🇷 Korean Test — Admin Panel</h1>
-<div class="wrap">
-<div class="card"><div class="ch"><span>1</span> Bo'lim tanlash <span style="margin-left:auto;font-size:10px;color:#e74c3c">majburiy</span></div><div class="cb"><div class="btn-g"><button class="sb" data-v="EPS TOPIK" onclick="document.querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));this.classList.add('on')">EPS TOPIK</button><button class="sb" data-v="TOPIK 1" onclick="document.querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));this.classList.add('on')">TOPIK 1</button><button class="sb" data-v="TOPIK 2" onclick="document.querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));this.classList.add('on')">TOPIK 2</button></div></div></div>
-<div class="card"><div class="ch"><span>2</span> Qiyinlik darajasi <span style="margin-left:auto;font-size:10px;color:#e74c3c">majburiy</span></div><div class="cb"><div class="btn-g"><button class="db" data-v="Very Easy" onclick="document.querySelectorAll('.db').forEach(b=>b.classList.remove('on'));this.classList.add('on')">🟢 Very Easy</button><button class="db" data-v="Easy" onclick="document.querySelectorAll('.db').forEach(b=>b.classList.remove('on'));this.classList.add('on')">🟡 Easy</button><button class="db" data-v="Medium" onclick="document.querySelectorAll('.db').forEach(b=>b.classList.remove('on'));this.classList.add('on')">🟠 Medium</button><button class="db" data-v="Hard" onclick="document.querySelectorAll('.db').forEach(b=>b.classList.remove('on'));this.classList.add('on')">🔴 Hard</button></div></div></div>
-<div class="card"><div class="ch"><span>3</span> Savol maqsadi <span style="margin-left:auto;font-size:10px;color:#6b7280">ixtiyoriy</span></div><div class="cb"><div class="fr"><textarea id="pt" placeholder="Masalan: Koreyscha gap tuzish..."></textarea><select id="pfs"><option value="14">Kichik</option><option value="18" selected>Orta</option><option value="22">Katta</option></select></div></div></div>
-<div class="card"><div class="ch"><span>4</span> Savol <span style="margin-left:auto;font-size:10px;color:#6b7280">ixtiyoriy</span></div><div class="cb"><div class="fr"><textarea id="qt" placeholder="Savol matnini yozing..."></textarea><select id="qfs"><option value="14">Kichik</option><option value="18" selected>Orta</option><option value="22">Katta</option></select></div><div class="ur"><label class="ub">🎧 Audio<input type="file" id="qAudio" accept="audio/*" onchange="showName(this,'qan')"></label><label class="ub">🖼 Rasm<input type="file" id="qImg" accept="image/*" onchange="showImg(this,'qip')"></label></div><div id="qan" class="fn"></div><img id="qip" class="ip"/></div></div>
-<div class="card"><div class="ch"><span>5</span> Variantlar <span style="margin-left:auto;font-size:10px;color:#e74c3c">majburiy</span></div><div class="cb"><div class="vg">
-<div class="vc" id="vc0"><div class="vh"><span class="vn">VARIANT 1</span><label class="cl"><input type="radio" name="correct" value="0" onchange="markCorrect(0)"> Togri ✓</label></div><div class="vf"><label>Matn + Shrift</label><div class="fr"><textarea id="o0t" placeholder="Variant 1..." style="min-height:50px"></textarea><select id="o0fs"><option value="14">Kichik</option><option value="18" selected>Orta</option><option value="22">Katta</option></select></div></div><div class="vf"><label>Audio</label><label class="ub">🎧<input type="file" id="o0a" accept="audio/*" onchange="showName(this,'o0an')"></label><div id="o0an" class="fn"></div></div><div class="vf"><label>Rasm</label><label class="ub">🖼<input type="file" id="o0i" accept="image/*" onchange="showImg(this,'o0ip')"></label><img id="o0ip" class="ip"/></div></div>
-<div class="vc" id="vc1"><div class="vh"><span class="vn">VARIANT 2</span><label class="cl"><input type="radio" name="correct" value="1" onchange="markCorrect(1)"> Togri ✓</label></div><div class="vf"><label>Matn + Shrift</label><div class="fr"><textarea id="o1t" placeholder="Variant 2..." style="min-height:50px"></textarea><select id="o1fs"><option value="14">Kichik</option><option value="18" selected>Orta</option><option value="22">Katta</option></select></div></div><div class="vf"><label>Audio</label><label class="ub">🎧<input type="file" id="o1a" accept="audio/*" onchange="showName(this,'o1an')"></label><div id="o1an" class="fn"></div></div><div class="vf"><label>Rasm</label><label class="ub">🖼<input type="file" id="o1i" accept="image/*" onchange="showImg(this,'o1ip')"></label><img id="o1ip" class="ip"/></div></div>
-<div class="vc" id="vc2"><div class="vh"><span class="vn">VARIANT 3</span><label class="cl"><input type="radio" name="correct" value="2" onchange="markCorrect(2)"> Togri ✓</label></div><div class="vf"><label>Matn + Shrift</label><div class="fr"><textarea id="o2t" placeholder="Variant 3..." style="min-height:50px"></textarea><select id="o2fs"><option value="14">Kichik</option><option value="18" selected>Orta</option><option value="22">Katta</option></select></div></div><div class="vf"><label>Audio</label><label class="ub">🎧<input type="file" id="o2a" accept="audio/*" onchange="showName(this,'o2an')"></label><div id="o2an" class="fn"></div></div><div class="vf"><label>Rasm</label><label class="ub">🖼<input type="file" id="o2i" accept="image/*" onchange="showImg(this,'o2ip')"></label><img id="o2ip" class="ip"/></div></div>
-<div class="vc" id="vc3"><div class="vh"><span class="vn">VARIANT 4</span><label class="cl"><input type="radio" name="correct" value="3" onchange="markCorrect(3)"> Togri ✓</label></div><div class="vf"><label>Matn + Shrift</label><div class="fr"><textarea id="o3t" placeholder="Variant 4..." style="min-height:50px"></textarea><select id="o3fs"><option value="14">Kichik</option><option value="18" selected>Orta</option><option value="22">Katta</option></select></div></div><div class="vf"><label>Audio</label><label class="ub">🎧<input type="file" id="o3a" accept="audio/*" onchange="showName(this,'o3an')"></label><div id="o3an" class="fn"></div></div><div class="vf"><label>Rasm</label><label class="ub">🖼<input type="file" id="o3i" accept="image/*" onchange="showImg(this,'o3ip')"></label><img id="o3ip" class="ip"/></div></div>
-</div></div></div>
-<div class="sba"><button id="sb" onclick="submitQuestion()">🚀 Firebase ga yuborish</button></div>
+<header>
+  <div class="logo">🇰🇷</div>
+  <h1>Korean Test — Admin Panel</h1>
+  <span>Firebase: koreantestapp</span>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-header"><div class="step">1</div><h2>Bo'lim tanlash</h2><span class="badge req">majburiy</span></div>
+    <div class="card-body">
+      <div class="btn-group" id="sectionGroup">
+        <button class="tog-btn" data-val="EPS TOPIK" onclick="selectSection(this)">EPS TOPIK</button>
+        <button class="tog-btn" data-val="TOPIK 1" onclick="selectSection(this)">TOPIK 1</button>
+        <button class="tog-btn" data-val="TOPIK 2" onclick="selectSection(this)">TOPIK 2</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="step">2</div><h2>Qiyinlik darajasi</h2><span class="badge req">majburiy</span></div>
+    <div class="card-body">
+      <div class="btn-group" id="diffGroup">
+        <button class="tog-btn" data-val="Very Easy" data-cls="active-ve" onclick="selectDiff(this)">🟢 Very Easy</button>
+        <button class="tog-btn" data-val="Easy" data-cls="active-e" onclick="selectDiff(this)">🟡 Easy</button>
+        <button class="tog-btn" data-val="Medium" data-cls="active-m" onclick="selectDiff(this)">🟠 Medium</button>
+        <button class="tog-btn" data-val="Above Medium" data-cls="active-am" onclick="selectDiff(this)">🟤 Above Medium</button>
+        <button class="tog-btn" data-val="Hard" data-cls="active-h" onclick="selectDiff(this)">🔴 Hard</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="step">3</div><h2>Savol maqsadi</h2><span class="badge opt">ixtiyoriy</span></div>
+    <div class="card-body">
+      <div class="field-row">
+        <textarea id="purposeText" placeholder="Masalan: So'z ma'nosini tushunish..."></textarea>
+        <select id="purposeFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="step">4</div><h2>Savol</h2><span class="badge opt">ixtiyoriy</span></div>
+    <div class="card-body">
+      <div class="field-row">
+        <textarea id="questionText" placeholder="Savol matnini yozing..."></textarea>
+        <select id="questionFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
+      </div>
+      <div class="upload-row">
+        <label class="upload-btn">🎧 Audio<input type="file" id="qAudioFile" accept="audio/*" onchange="showName(this,'qAudioName')"></label>
+        <label class="upload-btn">🖼 Rasm<input type="file" id="qImageFile" accept="image/*" onchange="showPreview(this,'qImgPreview')"></label>
+      </div>
+      <div id="qAudioName" class="fname"></div>
+      <img id="qImgPreview" class="ipreview"/>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="step">5</div><h2>Variantlar</h2><span class="badge req">majburiy</span></div>
+    <div class="card-body">
+      <div class="variants-grid">
+        <div class="vcard" id="vcard0">
+          <div class="vcard-header"><span class="vnum">VARIANT 1</span><label class="correct-lbl"><input type="radio" name="correct" value="0" onchange="markCorrect(0)"> To'g'ri ✓</label></div>
+          <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt0Text" placeholder="Variant 1..." style="min-height:55px"></textarea><select id="opt0FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
+          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧 Audio<input type="file" id="opt0Audio" accept="audio/*" onchange="showName(this,'opt0AudioName')"></label><div id="opt0AudioName" class="fname"></div></div>
+          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼 Rasm<input type="file" id="opt0Img" accept="image/*" onchange="showPreview(this,'opt0ImgPrev')"></label><img id="opt0ImgPrev" class="ipreview"/></div>
+        </div>
+        <div class="vcard" id="vcard1">
+          <div class="vcard-header"><span class="vnum">VARIANT 2</span><label class="correct-lbl"><input type="radio" name="correct" value="1" onchange="markCorrect(1)"> To'g'ri ✓</label></div>
+          <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt1Text" placeholder="Variant 2..." style="min-height:55px"></textarea><select id="opt1FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
+          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧 Audio<input type="file" id="opt1Audio" accept="audio/*" onchange="showName(this,'opt1AudioName')"></label><div id="opt1AudioName" class="fname"></div></div>
+          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼 Rasm<input type="file" id="opt1Img" accept="image/*" onchange="showPreview(this,'opt1ImgPrev')"></label><img id="opt1ImgPrev" class="ipreview"/></div>
+        </div>
+        <div class="vcard" id="vcard2">
+          <div class="vcard-header"><span class="vnum">VARIANT 3</span><label class="correct-lbl"><input type="radio" name="correct" value="2" onchange="markCorrect(2)"> To'g'ri ✓</label></div>
+          <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt2Text" placeholder="Variant 3..." style="min-height:55px"></textarea><select id="opt2FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
+          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧 Audio<input type="file" id="opt2Audio" accept="audio/*" onchange="showName(this,'opt2AudioName')"></label><div id="opt2AudioName" class="fname"></div></div>
+          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼 Rasm<input type="file" id="opt2Img" accept="image/*" onchange="showPreview(this,'opt2ImgPrev')"></label><img id="opt2ImgPrev" class="ipreview"/></div>
+        </div>
+        <div class="vcard" id="vcard3">
+          <div class="vcard-header"><span class="vnum">VARIANT 4</span><label class="correct-lbl"><input type="radio" name="correct" value="3" onchange="markCorrect(3)"> To'g'ri ✓</label></div>
+          <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt3Text" placeholder="Variant 4..." style="min-height:55px"></textarea><select id="opt3FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
+          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧 Audio<input type="file" id="opt3Audio" accept="audio/*" onchange="showName(this,'opt3AudioName')"></label><div id="opt3AudioName" class="fname"></div></div>
+          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼 Rasm<input type="file" id="opt3Img" accept="image/*" onchange="showPreview(this,'opt3ImgPrev')"></label><img id="opt3ImgPrev" class="ipreview"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="submit-area">
+    <button id="submitBtn" onclick="submitQuestion()">🚀 Firebase ga yuborish</button>
+    <div id="statusMsg" class="status-msg"></div>
+  </div>
 </div>
-</body></html>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyAOgwoxezdtV89KTdapbVHqzYjjt61_Cfk",
+  authDomain:"koreantestapp.firebaseapp.com",
+  projectId:"koreantestapp",
+  storageBucket:"koreantestapp.firebasestorage.app",
+  messagingSenderId:"927061643427",
+  appId:"1:927061643427:web:89338d7127243e38ed6f16"
+});
+var db=firebase.firestore();
+var storage=firebase.storage();
+
+function selectSection(btn){document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});btn.classList.add('active-section')}
+function selectDiff(btn){document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){b.classList.remove('active-ve','active-e','active-m','active-am','active-h')});btn.classList.add(btn.dataset.cls)}
+function markCorrect(idx){for(var i=0;i<4;i++)document.getElementById('vcard'+i).classList.remove('correct-selected');document.getElementById('vcard'+idx).classList.add('correct-selected')}
+function showName(input,targetId){if(input.files[0])document.getElementById(targetId).textContent='✅ '+input.files[0].name}
+function showPreview(input,targetId){if(input.files[0]){var r=new FileReader();r.onload=function(e){var img=document.getElementById(targetId);img.src=e.target.result;img.style.display='block'};r.readAsDataURL(input.files[0])}}
+function showStatus(msg,type){var el=document.getElementById('statusMsg');el.textContent=msg;el.className='status-msg '+type;el.style.display='block';setTimeout(function(){el.style.display='none'},5000)}
+
+async function uploadFile(file,path){
+  var ref=storage.ref(path);
+  await ref.put(file);
+  return await ref.getDownloadURL();
+}
+
+async function submitQuestion(){
+  var btn=document.getElementById('submitBtn');
+  var section=document.querySelector('#sectionGroup .tog-btn.active-section');
+  var diff=document.querySelector('#diffGroup .tog-btn[class*="active-"]');
+  var correctRadio=document.querySelector('input[name="correct"]:checked');
+  if(!section){showStatus('❌ Bolim tanlang!','error');return}
+  if(!diff){showStatus('❌ Qiyinlik darajasini tanlang!','error');return}
+  if(!correctRadio){showStatus('❌ Togri javobni belgilang!','error');return}
+  btn.disabled=true;btn.textContent='⏳ Yuklanmoqda...';
+  try{
+    var ts=Date.now();
+    var qa=document.getElementById('qAudioFile').files[0];
+    var qi=document.getElementById('qImageFile').files[0];
+    var qaUrl=qa?await uploadFile(qa,'audio/'+ts+'_q_'+qa.name):null;
+    var qiUrl=qi?await uploadFile(qi,'images/'+ts+'_q_'+qi.name):null;
+    var opts=[];
+    for(var i=0;i<4;i++){
+      var t=document.getElementById('opt'+i+'Text').value.trim()||null;
+      var fs=parseInt(document.getElementById('opt'+i+'FS').value);
+      var af=document.getElementById('opt'+i+'Audio').files[0];
+      var imf=document.getElementById('opt'+i+'Img').files[0];
+      var au=af?await uploadFile(af,'audio/'+ts+'_o'+i+'_'+af.name):null;
+      var iu=imf?await uploadFile(imf,'images/'+ts+'_o'+i+'_'+imf.name):null;
+      opts.push({text:t,fontSize:fs,audioUrl:au,imageUrl:iu});
+    }
+    await db.collection('questions').add({
+      section:section.dataset.val,
+      difficulty:diff.dataset.val,
+      purpose:document.getElementById('purposeText').value.trim()||null,
+      purposeFontSize:parseInt(document.getElementById('purposeFS').value),
+      questionText:document.getElementById('questionText').value.trim()||null,
+      questionFontSize:parseInt(document.getElementById('questionFS').value),
+      questionAudioUrl:qaUrl,
+      questionImageUrl:qiUrl,
+      options:opts,
+      correctIndex:parseInt(correctRadio.value),
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showStatus('✅ Savol muvaffaqiyatli saqlandi!','success');
+    document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});
+    document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){b.classList.remove('active-ve','active-e','active-m','active-am','active-h')});
+    document.getElementById('purposeText').value='';
+    document.getElementById('questionText').value='';
+    document.getElementById('qAudioFile').value='';
+    document.getElementById('qImageFile').value='';
+    document.getElementById('qAudioName').textContent='';
+    document.getElementById('qImgPreview').style.display='none';
+    for(var j=0;j<4;j++){
+      document.getElementById('opt'+j+'Text').value='';
+      document.getElementById('opt'+j+'Audio').value='';
+      document.getElementById('opt'+j+'Img').value='';
+      document.getElementById('opt'+j+'AudioName').textContent='';
+      document.getElementById('opt'+j+'ImgPrev').style.display='none';
+      document.getElementById('vcard'+j).classList.remove('correct-selected');
+    }
+    document.querySelectorAll('input[name="correct"]').forEach(function(r){r.checked=false});
+  }catch(err){
+    console.error(err);
+    showStatus('❌ Xatolik: '+err.message,'error');
+  }
+  btn.disabled=false;btn.textContent='🚀 Firebase ga yuborish';
+}
+</script>
+</body>
+</html>
