@@ -53,17 +53,18 @@ select:focus{border-color:var(--accent)}
 .correct-lbl input[type="radio"]{accent-color:var(--green);width:14px;height:14px;cursor:pointer}
 .vfield{margin-bottom:10px}
 .vfield label{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:5px;display:block}
- 
-/* ✅ Guruh savol bloki */
 .group-add-btn{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 18px;border-radius:10px;border:1.5px dashed var(--accent);background:rgba(79,142,247,0.05);color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;width:100%}
 .group-add-btn:hover{background:rgba(79,142,247,0.1)}
 .group-block{display:none;margin-top:14px;border:1.5px solid var(--accent);border-radius:14px;overflow:hidden}
 .group-block.show{display:block}
-.group-block-header{background:rgba(79,142,247,0.1);border-bottom:1px solid var(--accent);padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
+.group-block-header{background:rgba(79,142,247,0.1);border-bottom:1px solid rgba(79,142,247,0.3);padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
 .group-block-header span{font-size:13px;font-weight:800;color:var(--accent)}
 .group-block-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
 .remove-group-btn{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:var(--red);padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
- 
+.q1-media-box{background:rgba(79,142,247,0.06);border:1.5px solid rgba(79,142,247,0.25);border-radius:10px;padding:12px 14px}
+.q1-media-title{font-size:11px;font-weight:700;color:var(--accent);font-family:'IBM Plex Mono',monospace;margin-bottom:8px}
+.q1-media-content{font-size:13px;color:var(--text);line-height:1.6}
+.sect-title{font-size:12px;font-weight:700;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;text-transform:uppercase}
 .submit-area{text-align:center;padding:10px 0}
 #submitBtn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:15px 48px;border-radius:12px;font-family:'Sora',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(79,142,247,0.3)}
 #submitBtn:hover{transform:translateY(-2px)}
@@ -72,7 +73,6 @@ select:focus{border-color:var(--accent)}
 .status-msg.success{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--green);display:block}
 .status-msg.error{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:var(--red);display:block}
 .hint{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:6px}
-.sect-title{font-size:12px;font-weight:700;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -95,7 +95,7 @@ select:focus{border-color:var(--accent)}
     </div>
   </div>
  
-  <!-- 2. Test turi + Guruh tugmasi -->
+  <!-- 2. Test turi -->
   <div class="card">
     <div class="card-header"><div class="step">2</div><h2>Test turi</h2><span class="badge-req">majburiy</span></div>
     <div class="card-body">
@@ -105,44 +105,43 @@ select:focus{border-color:var(--accent)}
       </div>
       <p class="hint">📖 Reading — matn o'qish &nbsp;|&nbsp; 🎧 Listening — audio tinglash</p>
  
-      <!-- ✅ Guruh qo'shish tugmasi -->
+      <!-- Guruh tugmasi -->
       <button class="group-add-btn" id="groupAddBtn" onclick="toggleGroupBlock()">
         <span id="groupAddIcon">＋</span>
-        <span id="groupAddText">Guruh savol qo'shish (bitta audioga 2+ savol)</span>
+        <span id="groupAddText">Guruh savol qo'shish (bitta media uchun 2 ta savol)</span>
       </button>
  
-      <!-- ✅ 2-savol bloki -->
+      <!-- 2-savol bloki -->
       <div class="group-block" id="groupBlock">
         <div class="group-block-header">
-          <span>🔗 2-savol (xuddi shu audio/matn uchun)</span>
+          <span>🔗 2-savol</span>
           <button class="remove-group-btn" onclick="toggleGroupBlock()">✕ Olib tashlash</button>
         </div>
         <div class="group-block-body">
+ 
+          <!-- ✅ 1-savol media ko'rsatkichi -->
+          <div>
+            <div class="sect-title">📌 1-savol audio / matn / rasm</div>
+            <div class="q1-media-box">
+              <div class="q1-media-title">👆 1-savoldan avtomatik olinadi</div>
+              <div class="q1-media-content" id="q1MediaContent">
+                <span style="color:var(--muted);font-size:12px">1-savolga audio, matn yoki rasm qo'shsangiz shu yerda ko'rinadi</span>
+              </div>
+            </div>
+          </div>
+ 
           <!-- 2-savol maqsadi -->
           <div>
-            <div class="sect-title">Savol maqsadi</div>
+            <div class="sect-title">2-savol maqsadi</div>
             <div class="field-row">
               <textarea id="g2Purpose" placeholder="2-savol maqsadi..."></textarea>
               <select id="g2PurposeFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
             </div>
           </div>
-          <!-- 2-savol matni -->
-          <div>
-            <div class="sect-title">Savol matni</div>
-            <div class="field-row">
-              <textarea id="g2QuestionText" placeholder="2-savol matni..."></textarea>
-              <select id="g2QuestionFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
-            </div>
-            <div class="upload-row">
-              <label class="upload-btn">🎧 Audio<input type="file" id="g2Audio" accept="audio/*" onchange="showName(this,'g2AudioName')"></label>
-              <label class="upload-btn">🖼 Rasm<input type="file" id="g2Image" accept="image/*" onchange="showPreview(this,'g2ImgPrev')"></label>
-            </div>
-            <div id="g2AudioName" class="fname"></div>
-            <img id="g2ImgPrev" class="ipreview"/>
-          </div>
+ 
           <!-- 2-savol variantlari -->
           <div>
-            <div class="sect-title">Variantlar</div>
+            <div class="sect-title">2-savol variantlari</div>
             <div class="variants-grid">
               <div class="vcard" id="g2vcard0">
                 <div class="vcard-header"><span class="vnum">VARIANT 1</span><label class="correct-lbl"><input type="radio" name="g2correct" value="0" onchange="markCorrect2(0)"> To'g'ri ✓</label></div>
@@ -205,12 +204,12 @@ select:focus{border-color:var(--accent)}
     <div class="card-header"><div class="step">5</div><h2>Savol</h2><span class="badge-opt">ixtiyoriy</span></div>
     <div class="card-body">
       <div class="field-row">
-        <textarea id="questionText" placeholder="Savol matnini yozing..."></textarea>
+        <textarea id="questionText" placeholder="Savol matnini yozing..." oninput="updateQ1Media()"></textarea>
         <select id="questionFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
       </div>
       <div class="upload-row">
-        <label class="upload-btn">🎧 Audio<input type="file" id="qAudioFile" accept="audio/*" onchange="showName(this,'qAudioName')"></label>
-        <label class="upload-btn">🖼 Rasm<input type="file" id="qImageFile" accept="image/*" onchange="showPreview(this,'qImgPreview')"></label>
+        <label class="upload-btn">🎧 Audio<input type="file" id="qAudioFile" accept="audio/*" onchange="showName(this,'qAudioName');updateQ1Media()"></label>
+        <label class="upload-btn">🖼 Rasm<input type="file" id="qImageFile" accept="image/*" onchange="showPreview(this,'qImgPreview');updateQ1Media()"></label>
       </div>
       <div id="qAudioName" class="fname"></div>
       <img id="qImgPreview" class="ipreview"/>
@@ -225,26 +224,26 @@ select:focus{border-color:var(--accent)}
         <div class="vcard" id="vcard0">
           <div class="vcard-header"><span class="vnum">VARIANT 1</span><label class="correct-lbl"><input type="radio" name="correct" value="0" onchange="markCorrect(0)"> To'g'ri ✓</label></div>
           <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt0Text" placeholder="Variant 1..." style="min-height:55px"></textarea><select id="opt0FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧 Audio<input type="file" id="opt0Audio" accept="audio/*" onchange="showName(this,'opt0AudioName')"></label><div id="opt0AudioName" class="fname"></div></div>
-          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼 Rasm<input type="file" id="opt0Img" accept="image/*" onchange="showPreview(this,'opt0ImgPrev')"></label><img id="opt0ImgPrev" class="ipreview"/></div>
+          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="opt0Audio" accept="audio/*" onchange="showName(this,'opt0AudioName')"></label><div id="opt0AudioName" class="fname"></div></div>
+          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="opt0Img" accept="image/*" onchange="showPreview(this,'opt0ImgPrev')"></label><img id="opt0ImgPrev" class="ipreview"/></div>
         </div>
         <div class="vcard" id="vcard1">
           <div class="vcard-header"><span class="vnum">VARIANT 2</span><label class="correct-lbl"><input type="radio" name="correct" value="1" onchange="markCorrect(1)"> To'g'ri ✓</label></div>
           <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt1Text" placeholder="Variant 2..." style="min-height:55px"></textarea><select id="opt1FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧 Audio<input type="file" id="opt1Audio" accept="audio/*" onchange="showName(this,'opt1AudioName')"></label><div id="opt1AudioName" class="fname"></div></div>
-          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼 Rasm<input type="file" id="opt1Img" accept="image/*" onchange="showPreview(this,'opt1ImgPrev')"></label><img id="opt1ImgPrev" class="ipreview"/></div>
+          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="opt1Audio" accept="audio/*" onchange="showName(this,'opt1AudioName')"></label><div id="opt1AudioName" class="fname"></div></div>
+          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="opt1Img" accept="image/*" onchange="showPreview(this,'opt1ImgPrev')"></label><img id="opt1ImgPrev" class="ipreview"/></div>
         </div>
         <div class="vcard" id="vcard2">
           <div class="vcard-header"><span class="vnum">VARIANT 3</span><label class="correct-lbl"><input type="radio" name="correct" value="2" onchange="markCorrect(2)"> To'g'ri ✓</label></div>
           <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt2Text" placeholder="Variant 3..." style="min-height:55px"></textarea><select id="opt2FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧 Audio<input type="file" id="opt2Audio" accept="audio/*" onchange="showName(this,'opt2AudioName')"></label><div id="opt2AudioName" class="fname"></div></div>
-          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼 Rasm<input type="file" id="opt2Img" accept="image/*" onchange="showPreview(this,'opt2ImgPrev')"></label><img id="opt2ImgPrev" class="ipreview"/></div>
+          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="opt2Audio" accept="audio/*" onchange="showName(this,'opt2AudioName')"></label><div id="opt2AudioName" class="fname"></div></div>
+          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="opt2Img" accept="image/*" onchange="showPreview(this,'opt2ImgPrev')"></label><img id="opt2ImgPrev" class="ipreview"/></div>
         </div>
         <div class="vcard" id="vcard3">
           <div class="vcard-header"><span class="vnum">VARIANT 4</span><label class="correct-lbl"><input type="radio" name="correct" value="3" onchange="markCorrect(3)"> To'g'ri ✓</label></div>
           <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt3Text" placeholder="Variant 4..." style="min-height:55px"></textarea><select id="opt3FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧 Audio<input type="file" id="opt3Audio" accept="audio/*" onchange="showName(this,'opt3AudioName')"></label><div id="opt3AudioName" class="fname"></div></div>
-          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼 Rasm<input type="file" id="opt3Img" accept="image/*" onchange="showPreview(this,'opt3ImgPrev')"></label><img id="opt3ImgPrev" class="ipreview"/></div>
+          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="opt3Audio" accept="audio/*" onchange="showName(this,'opt3AudioName')"></label><div id="opt3AudioName" class="fname"></div></div>
+          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="opt3Img" accept="image/*" onchange="showPreview(this,'opt3ImgPrev')"></label><img id="opt3ImgPrev" class="ipreview"/></div>
         </div>
       </div>
     </div>
@@ -290,23 +289,50 @@ function selectDiff(btn){
   btn.classList.add(btn.dataset.cls);
 }
  
-// ✅ Guruh blokini ko'rsatish/yashirish
+// ✅ 1-savol mediasini 2-savol blokida ko'rsatish
+function updateQ1Media(){
+  if(!hasGroupQ)return;
+  var content=document.getElementById('q1MediaContent');
+  var html='';
+  var qtext=document.getElementById('questionText').value.trim();
+  var audioFile=document.getElementById('qAudioFile').files[0];
+  var imgEl=document.getElementById('qImgPreview');
+ 
+  if(audioFile){
+    html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border-radius:8px;margin-bottom:6px">'+
+      '<span style="font-size:18px">🎧</span>'+
+      '<span style="color:var(--green);font-size:12px;font-family:IBM Plex Mono,monospace">'+audioFile.name+'</span>'+
+    '</div>';
+  }
+  if(qtext){
+    html+='<div style="padding:8px 12px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-size:13px">'+qtext+'</div>';
+  }
+  if(imgEl.src&&imgEl.style.display!=='none'){
+    html+='<img src="'+imgEl.src+'" style="max-width:100%;max-height:160px;border-radius:8px;margin-top:4px;display:block"/>';
+  }
+  if(!html){
+    html='<span style="color:var(--muted);font-size:12px">1-savolga audio, matn yoki rasm qo\'shsangiz shu yerda ko\'rinadi</span>';
+  }
+  content.innerHTML=html;
+}
+ 
 function toggleGroupBlock(){
   hasGroupQ=!hasGroupQ;
   var block=document.getElementById('groupBlock');
-  var btn=document.getElementById('groupAddBtn');
   var icon=document.getElementById('groupAddIcon');
   var text=document.getElementById('groupAddText');
+  var btn=document.getElementById('groupAddBtn');
   if(hasGroupQ){
     block.classList.add('show');
     icon.textContent='✕';
     text.textContent='Guruh savolni olib tashlash';
     btn.style.borderColor='var(--red)';
     btn.style.color='var(--red)';
+    updateQ1Media();
   }else{
     block.classList.remove('show');
     icon.textContent='＋';
-    text.textContent='Guruh savol qo\'shish (bitta audioga 2+ savol)';
+    text.textContent='Guruh savol qo\'shish (bitta media uchun 2 ta savol)';
     btn.style.borderColor='';
     btn.style.color='';
     clearGroup2();
@@ -315,11 +341,6 @@ function toggleGroupBlock(){
  
 function clearGroup2(){
   document.getElementById('g2Purpose').value='';
-  document.getElementById('g2QuestionText').value='';
-  document.getElementById('g2Audio').value='';
-  document.getElementById('g2Image').value='';
-  document.getElementById('g2AudioName').textContent='';
-  document.getElementById('g2ImgPrev').style.display='none';
   for(var i=0;i<4;i++){
     document.getElementById('g2opt'+i+'Text').value='';
     document.getElementById('g2opt'+i+'Audio').value='';
@@ -354,7 +375,6 @@ function showStatus(msg,type){
   el.textContent=msg;el.className='status-msg '+type;el.style.display='block';
   setTimeout(function(){el.style.display='none'},6000);
 }
- 
 async function uploadFile(file,path){
   if(!file)return null;
   var ref=storage.ref(path);
@@ -367,103 +387,81 @@ async function submitQuestion(){
   var section=document.querySelector('#sectionGroup .tog-btn.active-section');
   var diff=document.querySelector('#diffGroup .tog-btn[class*="active-ve"],#diffGroup .tog-btn[class*="active-e"],#diffGroup .tog-btn[class*="active-m"],#diffGroup .tog-btn[class*="active-am"],#diffGroup .tog-btn[class*="active-h"]');
   var correctRadio=document.querySelector('input[name="correct"]:checked');
- 
   if(!section){showStatus('❌ Bo\'lim tanlang!','error');return}
   if(!diff){showStatus('❌ Qiyinlik darajasini tanlang!','error');return}
   if(!correctRadio){showStatus('❌ 1-savol to\'g\'ri javobni belgilang!','error');return}
- 
-  // Guruh bo'lsa 2-savol tekshirish
-  if(hasGroupQ){
-    var g2correct=document.querySelector('input[name="g2correct"]:checked');
-    if(!g2correct){showStatus('❌ 2-savol to\'g\'ri javobni belgilang!','error');return}
+  if(hasGroupQ&&!document.querySelector('input[name="g2correct"]:checked')){
+    showStatus('❌ 2-savol to\'g\'ri javobni belgilang!','error');return
   }
- 
   btn.disabled=true;btn.textContent='⏳ Yuklanmoqda...';
- 
   try{
     var ts=Date.now();
     var groupId=hasGroupQ?'group_'+ts.toString(36).toUpperCase():null;
  
-    // ── 1-savol ──
+    // 1-savol
     var qa=document.getElementById('qAudioFile').files[0];
     var qi=document.getElementById('qImageFile').files[0];
     var qaUrl=await uploadFile(qa,'audio/'+ts+'_q1_'+(qa?qa.name:''));
     var qiUrl=await uploadFile(qi,'images/'+ts+'_q1_'+(qi?qi.name:''));
- 
     var opts1=[];
     for(var i=0;i<4;i++){
-      var t=document.getElementById('opt'+i+'Text').value.trim()||null;
-      var fs=parseInt(document.getElementById('opt'+i+'FS').value);
       var af=document.getElementById('opt'+i+'Audio').files[0];
       var imf=document.getElementById('opt'+i+'Img').files[0];
       opts1.push({
-        text:t,fontSize:fs,
+        text:document.getElementById('opt'+i+'Text').value.trim()||null,
+        fontSize:parseInt(document.getElementById('opt'+i+'FS').value),
         audioUrl:await uploadFile(af,'audio/'+ts+'_q1o'+i+'_'+(af?af.name:'')),
         imageUrl:await uploadFile(imf,'images/'+ts+'_q1o'+i+'_'+(imf?imf.name:''))
       });
     }
- 
-    var q1Data={
-      section:section.dataset.val,
-      testType:selectedTestType,
-      difficulty:diff.dataset.val,
+    var q1={
+      section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
       purpose:document.getElementById('purposeText').value.trim()||null,
       purposeFontSize:parseInt(document.getElementById('purposeFS').value),
       questionText:document.getElementById('questionText').value.trim()||null,
       questionFontSize:parseInt(document.getElementById('questionFS').value),
-      questionAudioUrl:qaUrl,
-      questionImageUrl:qiUrl,
-      options:opts1,
-      correctIndex:parseInt(correctRadio.value),
+      questionAudioUrl:qaUrl,questionImageUrl:qiUrl,
+      options:opts1,correctIndex:parseInt(correctRadio.value),
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     };
-    if(groupId){q1Data.groupId=groupId;q1Data.groupOrder=1}
-    await db.collection('questions').add(q1Data);
+    if(groupId){q1.groupId=groupId;q1.groupOrder=1}
+    await db.collection('questions').add(q1);
  
-    // ── 2-savol (guruh bo'lsa) ──
+    // 2-savol — 1-savolning audio/matn/rasmi meros olinadi
     if(hasGroupQ){
-      var g2a=document.getElementById('g2Audio').files[0];
-      var g2i=document.getElementById('g2Image').files[0];
-      var g2aUrl=await uploadFile(g2a,'audio/'+ts+'_q2_'+(g2a?g2a.name:''));
-      var g2iUrl=await uploadFile(g2i,'images/'+ts+'_q2_'+(g2i?g2i.name:''));
- 
       var opts2=[];
       for(var j=0;j<4;j++){
-        var t2=document.getElementById('g2opt'+j+'Text').value.trim()||null;
-        var fs2=parseInt(document.getElementById('g2opt'+j+'FS').value);
         var af2=document.getElementById('g2opt'+j+'Audio').files[0];
         var imf2=document.getElementById('g2opt'+j+'Img').files[0];
         opts2.push({
-          text:t2,fontSize:fs2,
+          text:document.getElementById('g2opt'+j+'Text').value.trim()||null,
+          fontSize:parseInt(document.getElementById('g2opt'+j+'FS').value),
           audioUrl:await uploadFile(af2,'audio/'+ts+'_q2o'+j+'_'+(af2?af2.name:'')),
           imageUrl:await uploadFile(imf2,'images/'+ts+'_q2o'+j+'_'+(imf2?imf2.name:''))
         });
       }
- 
-      var g2correct=document.querySelector('input[name="g2correct"]:checked');
-      var q2Data={
-        section:section.dataset.val,
-        testType:selectedTestType,
-        difficulty:diff.dataset.val,
+      var g2c=document.querySelector('input[name="g2correct"]:checked');
+      var q2={
+        section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
+        // ✅ Faqat 2-savol maqsadi o'zgaradi
         purpose:document.getElementById('g2Purpose').value.trim()||null,
         purposeFontSize:parseInt(document.getElementById('g2PurposeFS').value),
-        questionText:document.getElementById('g2QuestionText').value.trim()||null,
-        questionFontSize:parseInt(document.getElementById('g2QuestionFS').value),
-        questionAudioUrl:g2aUrl,
-        questionImageUrl:g2iUrl,
-        options:opts2,
-        correctIndex:parseInt(g2correct.value),
-        groupId:groupId,
-        groupOrder:2,
+        // ✅ 1-savol text/audio/rasm meros olinadi
+        questionText:document.getElementById('questionText').value.trim()||null,
+        questionFontSize:parseInt(document.getElementById('questionFS').value),
+        questionAudioUrl:qaUrl,
+        questionImageUrl:qiUrl,
+        options:opts2,correctIndex:parseInt(g2c.value),
+        groupId:groupId,groupOrder:2,
         createdAt:firebase.firestore.FieldValue.serverTimestamp()
       };
-      await db.collection('questions').add(q2Data);
-      showStatus('✅ 2 ta savol birga saqlandi! Guruh: '+groupId,'success');
+      await db.collection('questions').add(q2);
+      showStatus('✅ 2 ta savol saqlandi! Guruh: '+groupId,'success');
     }else{
-      showStatus('✅ Savol muvaffaqiyatli saqlandi! ('+selectedTestType+')','success');
+      showStatus('✅ Savol saqlandi! ('+selectedTestType+')','success');
     }
  
-    // Formani tozalash
+    // Tozalash
     document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});
     document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){b.classList.remove('active-ve','active-e','active-m','active-am','active-h')});
     document.getElementById('purposeText').value='';
@@ -482,8 +480,7 @@ async function submitQuestion(){
     }
     document.querySelectorAll('input[name="correct"]').forEach(function(r){r.checked=false});
     selectType('Reading',document.getElementById('readingBtn'));
-    if(hasGroupQ){toggleGroupBlock()}
- 
+    if(hasGroupQ)toggleGroupBlock();
   }catch(err){
     console.error(err);
     showStatus('❌ Xatolik: '+err.message,'error');
