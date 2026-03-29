@@ -26,6 +26,8 @@ header span{margin-left:auto;font-size:11px;color:var(--muted);font-family:'IBM 
 .tog-btn{padding:9px 20px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
 .tog-btn:hover{border-color:var(--accent);color:var(--text)}
 .tog-btn.active-section{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff}
+.tog-btn.active-reading{background:#7c5cfc;border-color:transparent;color:#fff}
+.tog-btn.active-listening{background:#1565C0;border-color:transparent;color:#fff}
 .tog-btn.active-ve{background:#27ae60;border-color:transparent;color:#fff}
 .tog-btn.active-e{background:#2ecc71;border-color:transparent;color:#fff}
 .tog-btn.active-m{background:var(--yellow);border-color:transparent;color:#000}
@@ -68,6 +70,8 @@ select:focus{border-color:var(--accent)}
   <span>Firebase: koreantestapp</span>
 </header>
 <div class="container">
+ 
+  <!-- 1. Bo'lim -->
   <div class="card">
     <div class="card-header"><div class="step">1</div><h2>Bo'lim tanlash</h2><span class="badge req">majburiy</span></div>
     <div class="card-body">
@@ -78,15 +82,22 @@ select:focus{border-color:var(--accent)}
       </div>
     </div>
   </div>
+ 
+  <!-- 2. Test turi -->
   <div class="card">
-    <div class="card-header"><div class="step">2</div><h2>Test turi</h2><span class="badge opt">ixtiyoriy</span></div>
+    <div class="card-header"><div class="step">2</div><h2>Test turi</h2><span class="badge req">majburiy</span></div>
     <div class="card-body">
       <div class="btn-group">
-        <button class="tog-btn" id="listeningBtn" onclick="toggleListening(this)">🎧 Listening</button>
+        <button class="tog-btn active-reading" id="readingBtn" onclick="selectType('Reading',this)">📖 Reading</button>
+        <button class="tog-btn" id="listeningBtn" onclick="selectType('Listening',this)">🎧 Listening</button>
       </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:8px;font-family:'IBM Plex Mono',monospace;">Listening savol bo'lsa bosing. Oddiy text savol bo'lsa bosmasdan o'ting.</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;font-family:'IBM Plex Mono',monospace;">
+        📖 Reading — matn o'qish savoli &nbsp;|&nbsp; 🎧 Listening — audio tinglash savoli
+      </div>
     </div>
   </div>
+ 
+  <!-- 3. Qiyinlik -->
   <div class="card">
     <div class="card-header"><div class="step">3</div><h2>Qiyinlik darajasi</h2><span class="badge req">majburiy</span></div>
     <div class="card-body">
@@ -99,6 +110,8 @@ select:focus{border-color:var(--accent)}
       </div>
     </div>
   </div>
+ 
+  <!-- 4. Savol maqsadi -->
   <div class="card">
     <div class="card-header"><div class="step">4</div><h2>Savol maqsadi</h2><span class="badge opt">ixtiyoriy</span></div>
     <div class="card-body">
@@ -108,6 +121,8 @@ select:focus{border-color:var(--accent)}
       </div>
     </div>
   </div>
+ 
+  <!-- 5. Savol -->
   <div class="card">
     <div class="card-header"><div class="step">5</div><h2>Savol</h2><span class="badge opt">ixtiyoriy</span></div>
     <div class="card-body">
@@ -123,6 +138,8 @@ select:focus{border-color:var(--accent)}
       <img id="qImgPreview" class="ipreview"/>
     </div>
   </div>
+ 
+  <!-- 6. Variantlar -->
   <div class="card">
     <div class="card-header"><div class="step">6</div><h2>Variantlar</h2><span class="badge req">majburiy</span></div>
     <div class="card-body">
@@ -154,12 +171,13 @@ select:focus{border-color:var(--accent)}
       </div>
     </div>
   </div>
+ 
   <div class="submit-area">
     <button id="submitBtn" onclick="submitQuestion()">🚀 Firebase ga yuborish</button>
     <div id="statusMsg" class="status-msg"></div>
   </div>
 </div>
-
+ 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
@@ -174,36 +192,78 @@ firebase.initializeApp({
 });
 var db=firebase.firestore();
 var storage=firebase.storage();
-
-function selectSection(btn){document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});btn.classList.add('active-section')}
-function toggleListening(btn){btn.classList.toggle('active-section')}
-function selectDiff(btn){document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){b.classList.remove('active-ve','active-e','active-m','active-am','active-h')});btn.classList.add(btn.dataset.cls)}
-function markCorrect(idx){for(var i=0;i<4;i++)document.getElementById('vcard'+i).classList.remove('correct-selected');document.getElementById('vcard'+idx).classList.add('correct-selected')}
-function showName(input,targetId){if(input.files[0])document.getElementById(targetId).textContent='✅ '+input.files[0].name}
-function showPreview(input,targetId){if(input.files[0]){var r=new FileReader();r.onload=function(e){var img=document.getElementById(targetId);img.src=e.target.result;img.style.display='block'};r.readAsDataURL(input.files[0])}}
-function showStatus(msg,type){var el=document.getElementById('statusMsg');el.textContent=msg;el.className='status-msg '+type;el.style.display='block';setTimeout(function(){el.style.display='none'},5000)}
-
+ 
+// ✅ Default: Reading tanlangan
+var selectedTestType='Reading';
+ 
+function selectSection(btn){
+  document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});
+  btn.classList.add('active-section');
+}
+ 
+// ✅ Reading / Listening tanlash
+function selectType(type,btn){
+  selectedTestType=type;
+  document.getElementById('readingBtn').classList.remove('active-reading','active-listening');
+  document.getElementById('listeningBtn').classList.remove('active-reading','active-listening');
+  btn.classList.add(type==='Reading'?'active-reading':'active-listening');
+}
+ 
+function selectDiff(btn){
+  document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){
+    b.classList.remove('active-ve','active-e','active-m','active-am','active-h')
+  });
+  btn.classList.add(btn.dataset.cls);
+}
+ 
+function markCorrect(idx){
+  for(var i=0;i<4;i++)document.getElementById('vcard'+i).classList.remove('correct-selected');
+  document.getElementById('vcard'+idx).classList.add('correct-selected');
+}
+ 
+function showName(input,targetId){
+  if(input.files[0])document.getElementById(targetId).textContent='✅ '+input.files[0].name;
+}
+ 
+function showPreview(input,targetId){
+  if(input.files[0]){
+    var r=new FileReader();
+    r.onload=function(e){var img=document.getElementById(targetId);img.src=e.target.result;img.style.display='block'};
+    r.readAsDataURL(input.files[0]);
+  }
+}
+ 
+function showStatus(msg,type){
+  var el=document.getElementById('statusMsg');
+  el.textContent=msg;el.className='status-msg '+type;el.style.display='block';
+  setTimeout(function(){el.style.display='none'},5000);
+}
+ 
 async function uploadFile(file,path){
   var ref=storage.ref(path);
-  await ref.put(file);
-  return await ref.getDownloadURL();
+  var snap=await ref.put(file);
+  return await snap.ref.getDownloadURL();
 }
-
+ 
 async function submitQuestion(){
   var btn=document.getElementById('submitBtn');
   var section=document.querySelector('#sectionGroup .tog-btn.active-section');
-  var diff=document.querySelector('#diffGroup .tog-btn[class*="active-"]');
+  var diff=document.querySelector('#diffGroup .tog-btn[class*="active-ve"], #diffGroup .tog-btn[class*="active-e"], #diffGroup .tog-btn[class*="active-m"], #diffGroup .tog-btn[class*="active-am"], #diffGroup .tog-btn[class*="active-h"]');
   var correctRadio=document.querySelector('input[name="correct"]:checked');
-  if(!section){showStatus('❌ Bolim tanlang!','error');return}
+ 
+  if(!section){showStatus('❌ Bo\'lim tanlang!','error');return}
   if(!diff){showStatus('❌ Qiyinlik darajasini tanlang!','error');return}
-  if(!correctRadio){showStatus('❌ Togri javobni belgilang!','error');return}
+  if(!correctRadio){showStatus('❌ To\'g\'ri javobni belgilang!','error');return}
+ 
   btn.disabled=true;btn.textContent='⏳ Yuklanmoqda...';
+ 
   try{
     var ts=Date.now();
     var qa=document.getElementById('qAudioFile').files[0];
     var qi=document.getElementById('qImageFile').files[0];
     var qaUrl=qa?await uploadFile(qa,'audio/'+ts+'_q_'+qa.name):null;
     var qiUrl=qi?await uploadFile(qi,'images/'+ts+'_q_'+qi.name):null;
+ 
     var opts=[];
     for(var i=0;i<4;i++){
       var t=document.getElementById('opt'+i+'Text').value.trim()||null;
@@ -214,9 +274,10 @@ async function submitQuestion(){
       var iu=imf?await uploadFile(imf,'images/'+ts+'_o'+i+'_'+imf.name):null;
       opts.push({text:t,fontSize:fs,audioUrl:au,imageUrl:iu});
     }
+ 
     await db.collection('questions').add({
       section:section.dataset.val,
-      testType:document.getElementById('listeningBtn').classList.contains('active-section')?'Listening':'Reading',
+      testType:selectedTestType,
       difficulty:diff.dataset.val,
       purpose:document.getElementById('purposeText').value.trim()||null,
       purposeFontSize:parseInt(document.getElementById('purposeFS').value),
@@ -228,9 +289,11 @@ async function submitQuestion(){
       correctIndex:parseInt(correctRadio.value),
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
-    showStatus('✅ Savol muvaffaqiyatli saqlandi!','success');
+ 
+    showStatus('✅ Savol muvaffaqiyatli saqlandi! ('+selectedTestType+')','success');
+ 
+    // Formani tozalash
     document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});
-    document.getElementById('listeningBtn').classList.remove('active-section');
     document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){b.classList.remove('active-ve','active-e','active-m','active-am','active-h')});
     document.getElementById('purposeText').value='';
     document.getElementById('questionText').value='';
@@ -247,6 +310,9 @@ async function submitQuestion(){
       document.getElementById('vcard'+j).classList.remove('correct-selected');
     }
     document.querySelectorAll('input[name="correct"]').forEach(function(r){r.checked=false});
+    // Reading ga qaytarish
+    selectType('Reading',document.getElementById('readingBtn'));
+ 
   }catch(err){
     console.error(err);
     showStatus('❌ Xatolik: '+err.message,'error');
@@ -256,3 +322,4 @@ async function submitQuestion(){
 </script>
 </body>
 </html>
+ 
