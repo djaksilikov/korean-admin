@@ -82,7 +82,7 @@ select:focus{border-color:var(--accent)}
   <span>Firebase: koreantestapp</span>
 </header>
 <div class="container">
- 
+
   <!-- 1. Bo'lim -->
   <div class="card">
     <div class="card-header"><div class="step">1</div><h2>Bo'lim tanlash</h2><span class="badge-req">majburiy</span></div>
@@ -94,7 +94,7 @@ select:focus{border-color:var(--accent)}
       </div>
     </div>
   </div>
- 
+
   <!-- 2. Test turi -->
   <div class="card">
     <div class="card-header"><div class="step">2</div><h2>Test turi</h2><span class="badge-req">majburiy</span></div>
@@ -104,13 +104,13 @@ select:focus{border-color:var(--accent)}
         <button class="tog-btn" id="listeningBtn" onclick="selectType('Listening',this)">🎧 Listening</button>
       </div>
       <p class="hint">📖 Reading — matn o'qish &nbsp;|&nbsp; 🎧 Listening — audio tinglash</p>
- 
+
       <!-- Guruh tugmasi -->
       <button class="group-add-btn" id="groupAddBtn" onclick="toggleGroupBlock()">
         <span id="groupAddIcon">＋</span>
         <span id="groupAddText">Guruh savol qo'shish (bitta media uchun 2 ta savol)</span>
       </button>
- 
+
       <!-- 2-savol bloki -->
       <div class="group-block" id="groupBlock">
         <div class="group-block-header">
@@ -118,7 +118,7 @@ select:focus{border-color:var(--accent)}
           <button class="remove-group-btn" onclick="toggleGroupBlock()">✕ Olib tashlash</button>
         </div>
         <div class="group-block-body">
- 
+
           <!-- ✅ 1-savol media ko'rsatkichi -->
           <div>
             <div class="sect-title">📌 1-savol audio / matn / rasm</div>
@@ -129,7 +129,7 @@ select:focus{border-color:var(--accent)}
               </div>
             </div>
           </div>
- 
+
           <!-- 2-savol maqsadi -->
           <div>
             <div class="sect-title">2-savol maqsadi</div>
@@ -138,7 +138,7 @@ select:focus{border-color:var(--accent)}
               <select id="g2PurposeFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
             </div>
           </div>
- 
+
           <!-- 2-savol variantlari -->
           <div>
             <div class="sect-title">2-savol variantlari</div>
@@ -173,7 +173,7 @@ select:focus{border-color:var(--accent)}
       </div>
     </div>
   </div>
- 
+
   <!-- 3. Qiyinlik -->
   <div class="card">
     <div class="card-header"><div class="step">3</div><h2>Qiyinlik darajasi</h2><span class="badge-req">majburiy</span></div>
@@ -187,24 +187,26 @@ select:focus{border-color:var(--accent)}
       </div>
     </div>
   </div>
- 
+
   <!-- 4. Savol maqsadi -->
   <div class="card">
     <div class="card-header"><div class="step">4</div><h2>Savol maqsadi</h2><span class="badge-opt">ixtiyoriy</span></div>
     <div class="card-body">
       <div class="field-row">
         <textarea id="purposeText" placeholder="Masalan: 다음을 듣고 물음에 답하십시오."></textarea>
+        <button type="button" onclick="wrapUnderline('purposeText')" style="margin-top:6px;padding:5px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:IBM Plex Mono,monospace"><u>A</u> Osti chiziq</button>
         <select id="purposeFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
       </div>
     </div>
   </div>
- 
+
   <!-- 5. Savol -->
   <div class="card">
     <div class="card-header"><div class="step">5</div><h2>Savol</h2><span class="badge-opt">ixtiyoriy</span></div>
     <div class="card-body">
       <div class="field-row">
         <textarea id="questionText" placeholder="Savol matnini yozing..." oninput="updateQ1Media()"></textarea>
+        <button type="button" onclick="wrapUnderline('questionText')" style="margin-top:6px;padding:5px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:IBM Plex Mono,monospace"><u>A</u> Osti chiziq</button>
         <select id="questionFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
       </div>
       <div class="upload-row">
@@ -215,7 +217,7 @@ select:focus{border-color:var(--accent)}
       <img id="qImgPreview" class="ipreview"/>
     </div>
   </div>
- 
+
   <!-- 6. Variantlar -->
   <div class="card">
     <div class="card-header"><div class="step">6</div><h2>Variantlar</h2><span class="badge-req">majburiy</span></div>
@@ -248,17 +250,32 @@ select:focus{border-color:var(--accent)}
       </div>
     </div>
   </div>
- 
+
   <div class="submit-area">
     <button id="submitBtn" onclick="submitQuestion()">🚀 Firebase ga yuborish</button>
     <div id="statusMsg" class="status-msg"></div>
   </div>
 </div>
- 
+
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 <script>
+// ✅ Osti chiziq funksiyasi
+function wrapUnderline(id){
+  var ta=document.getElementById(id);
+  var start=ta.selectionStart;
+  var end=ta.selectionEnd;
+  var sel=ta.value.substring(start,end);
+  if(sel.length===0){alert("Avval matnni tanlang!");return;}
+  var before=ta.value.substring(0,start);
+  var after=ta.value.substring(end);
+  ta.value=before+"__"+sel+"__"+after;
+  ta.selectionStart=start;
+  ta.selectionEnd=end+4;
+  ta.dispatchEvent(new Event("input"));
+}
+
 firebase.initializeApp({
   apiKey:"AIzaSyAOgwoxezdtV89KTdapbVHqzYjjt61_Cfk",
   authDomain:"koreantestapp.firebaseapp.com",
@@ -271,7 +288,7 @@ var db=firebase.firestore();
 var storage=firebase.storage();
 var selectedTestType='Reading';
 var hasGroupQ=false;
- 
+
 function selectSection(btn){
   document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});
   btn.classList.add('active-section');
@@ -288,7 +305,7 @@ function selectDiff(btn){
   });
   btn.classList.add(btn.dataset.cls);
 }
- 
+
 // ✅ 1-savol mediasini 2-savol blokida ko'rsatish
 function updateQ1Media(){
   if(!hasGroupQ)return;
@@ -297,7 +314,7 @@ function updateQ1Media(){
   var qtext=document.getElementById('questionText').value.trim();
   var audioFile=document.getElementById('qAudioFile').files[0];
   var imgEl=document.getElementById('qImgPreview');
- 
+
   if(audioFile){
     html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border-radius:8px;margin-bottom:6px">'+
       '<span style="font-size:18px">🎧</span>'+
@@ -315,7 +332,7 @@ function updateQ1Media(){
   }
   content.innerHTML=html;
 }
- 
+
 function toggleGroupBlock(){
   hasGroupQ=!hasGroupQ;
   var block=document.getElementById('groupBlock');
@@ -338,7 +355,7 @@ function toggleGroupBlock(){
     clearGroup2();
   }
 }
- 
+
 function clearGroup2(){
   document.getElementById('g2Purpose').value='';
   for(var i=0;i<4;i++){
@@ -351,7 +368,7 @@ function clearGroup2(){
   }
   document.querySelectorAll('input[name="g2correct"]').forEach(function(r){r.checked=false});
 }
- 
+
 function markCorrect(idx){
   for(var i=0;i<4;i++)document.getElementById('vcard'+i).classList.remove('correct-selected');
   document.getElementById('vcard'+idx).classList.add('correct-selected');
@@ -381,7 +398,7 @@ async function uploadFile(file,path){
   var snap=await ref.put(file);
   return await snap.ref.getDownloadURL();
 }
- 
+
 async function submitQuestion(){
   var btn=document.getElementById('submitBtn');
   var section=document.querySelector('#sectionGroup .tog-btn.active-section');
@@ -397,7 +414,7 @@ async function submitQuestion(){
   try{
     var ts=Date.now();
     var groupId=hasGroupQ?'group_'+ts.toString(36).toUpperCase():null;
- 
+
     // 1-savol
     var qa=document.getElementById('qAudioFile').files[0];
     var qi=document.getElementById('qImageFile').files[0];
@@ -426,7 +443,7 @@ async function submitQuestion(){
     };
     if(groupId){q1.groupId=groupId;q1.groupOrder=1}
     await db.collection('questions').add(q1);
- 
+
     // 2-savol — 1-savolning audio/matn/rasmi meros olinadi
     if(hasGroupQ){
       var opts2=[];
@@ -460,7 +477,7 @@ async function submitQuestion(){
     }else{
       showStatus('✅ Savol saqlandi! ('+selectedTestType+')','success');
     }
- 
+
     // Tozalash
     document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});
     document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){b.classList.remove('active-ve','active-e','active-m','active-am','active-h')});
@@ -490,4 +507,3 @@ async function submitQuestion(){
 </script>
 </body>
 </html>
- 
