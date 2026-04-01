@@ -79,9 +79,12 @@ select:focus{border-color:var(--accent)}
 <header>
   <div class="logo">🇰🇷</div>
   <h1>Korean Test — Admin Panel</h1>
-  <span>Firebase: koreantestapp</span>
+  <div style="display:flex;gap:8px;margin-left:auto">
+    <button id="tabAdd" onclick="showTab('add')" style="padding:7px 16px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:12px;font-weight:700;cursor:pointer">➕ Yangi savol</button>
+    <button id="tabPreview" onclick="showTab('preview')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer">👁 Ko'rinish & Tahrir</button>
+  </div>
 </header>
-<div class="container">
+<div id="pageAdd" class="container">
 
   <!-- 1. Bo'lim -->
   <div class="card">
@@ -505,5 +508,80 @@ async function submitQuestion(){
   btn.disabled=false;btn.textContent='🚀 Firebase ga yuborish';
 }
 </script>
+
+<div id="pagePreview" style="display:none;max-width:900px;margin:0 auto;padding:24px 20px">
+
+  <!-- Qidiruv -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+    <div style="font-size:14px;font-weight:800;margin-bottom:14px">🔍 Savol qidirish</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <input id="pvSearch" placeholder="Matn bo'yicha qidirish..." style="flex:1;min-width:180px;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
+      <select id="pvSection" style="padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
+        <option value="">Barcha bo'lim</option>
+        <option>EPS TOPIK</option><option>TOPIK 1</option><option>TOPIK 2</option>
+      </select>
+      <select id="pvType" style="padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
+        <option value="">Barcha tur</option>
+        <option value="Reading">📖 Reading</option>
+        <option value="Listening">🎧 Listening</option>
+      </select>
+      <select id="pvDiff" style="padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
+        <option value="">Barcha qiyinlik</option>
+        <option>Very Easy</option><option>Easy</option><option>Medium</option><option>Above Medium</option><option>Hard</option>
+      </select>
+      <button onclick="pvLoad()" style="padding:9px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:13px;font-weight:700;cursor:pointer">🔍 Qidirish</button>
+    </div>
+    <div id="pvStatus" style="font-size:12px;color:#6b7280;font-family:'IBM Plex Mono',monospace"></div>
+  </div>
+
+  <!-- So'nggi savollar + qidiruv natijalari -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+    <!-- Chap: ro'yxat -->
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;font-family:'IBM Plex Mono',monospace">Savollar</div>
+      <div id="pvList" style="display:flex;flex-direction:column;gap:8px;max-height:600px;overflow-y:auto">
+        <div style="color:#6b7280;font-size:13px;text-align:center;padding:30px">Yuklash uchun 🔍 bosing</div>
+      </div>
+    </div>
+
+    <!-- O'ng: ilova ko'rinishi -->
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;font-family:'IBM Plex Mono',monospace">Ilova ko'rinishi</div>
+      <div id="pvPhone" style="background:#E8ECF0;border-radius:28px;padding:16px;min-height:400px;box-shadow:6px 6px 14px #C8CDD4,-6px -6px 14px #fff">
+        <div style="color:#8E97A5;font-size:12px;text-align:center;padding:40px 0">Savol tanlang</div>
+      </div>
+
+      <!-- Tahrirlash paneli -->
+      <div id="pvEditPanel" style="display:none;margin-top:16px;background:#1e2330;border:1.5px solid #4f8ef7;border-radius:14px;padding:20px">
+        <div style="font-size:14px;font-weight:800;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+          <span>✏️ Tahrirlash</span>
+          <button id="pvDelBtn" style="padding:5px 12px;border-radius:6px;border:none;background:#c0392b;color:#fff;font-size:12px;cursor:pointer">🗑 O'chirish</button>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">SAVOL MAQSADI</label>
+          <textarea id="pvPurpose" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #2a3045;background:#0d0f14;color:#e8eaf0;font-size:13px;resize:vertical;min-height:50px"></textarea>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">SAVOL MATNI</label>
+          <textarea id="pvQText" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #2a3045;background:#0d0f14;color:#e8eaf0;font-size:13px;resize:vertical;min-height:50px"></textarea>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">TO'G'RI JAVOB</label>
+          <select id="pvCorrect" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #2a3045;background:#0d0f14;color:#e8eaf0;font-size:13px">
+            <option value="0">① 1-variant</option>
+            <option value="1">② 2-variant</option>
+            <option value="2">③ 3-variant</option>
+            <option value="3">④ 4-variant</option>
+          </select>
+        </div>
+        <div id="pvOptsEdit" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"></div>
+        <div id="pvSaveStatus" style="font-size:12px;margin-bottom:8px"></div>
+        <button id="pvSaveBtn" style="width:100%;padding:11px;border-radius:8px;border:none;background:#27ae60;color:#fff;font-size:13px;font-weight:700;cursor:pointer">💾 Saqlash</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
