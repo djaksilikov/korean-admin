@@ -174,7 +174,24 @@ select:focus{border-color:var(--accent)}
   </div>
 
   <div class="card">
-    <div class="card-header"><div class="step">4</div><h2>Savol maqsadi</h2><span class="badge-opt">ixtiyoriy</span></div>
+    <div class="card-header"><div class="step">4</div><h2>Yuqori sarlavha</h2><span class="badge-opt">ixtiyoriy</span></div>
+    <div class="card-body">
+      <div class="field-row">
+        <textarea id="topTitleText" placeholder="Masalan: &lt;책&gt; yoki 다음 글을 읽고..." style="min-height:50px"></textarea>
+        <button type="button" onclick="wrapUnderline('topTitleText')" style="margin-top:6px;padding:5px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:IBM Plex Mono,monospace"><u>A</u> Osti</button>
+        <select id="topTitleFS">
+          <option value="20">Kichik (20)</option>
+          <option value="26" selected>O'rta (26)</option>
+          <option value="32">Katta (32)</option>
+          <option value="38">Juda katta (38)</option>
+        </select>
+      </div>
+      <p class="hint">Savol ekranining yuqori o'rtasida katta shrift bilan chiqadi</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="step">5</div><h2>Savol maqsadi</h2><span class="badge-opt">ixtiyoriy</span></div>
     <div class="card-body">
       <div class="field-row">
         <textarea id="purposeText" placeholder="Masalan: 다음을 듣고 물음에 답하십시오."></textarea>
@@ -185,7 +202,7 @@ select:focus{border-color:var(--accent)}
   </div>
 
   <div class="card">
-    <div class="card-header"><div class="step">5</div><h2>Savol</h2><span class="badge-opt">ixtiyoriy</span></div>
+    <div class="card-header"><div class="step">6</div><h2>Savol</h2><span class="badge-opt">ixtiyoriy</span></div>
     <div class="card-body">
       <div class="field-row">
         <textarea id="questionText" placeholder="Savol matnini yozing..." oninput="updateQ1Media()"></textarea>
@@ -202,7 +219,7 @@ select:focus{border-color:var(--accent)}
   </div>
 
   <div class="card">
-    <div class="card-header"><div class="step">6</div><h2>Variantlar</h2><span class="badge-req">majburiy</span></div>
+    <div class="card-header"><div class="step">7</div><h2>Variantlar</h2><span class="badge-req">majburiy</span></div>
     <div class="card-body">
       <div class="variants-grid" id="optsGrid"></div>
     </div>
@@ -374,9 +391,14 @@ function showStatus(msg,type){
   el.textContent=msg;el.className="status-msg "+type;
   setTimeout(function(){el.style.display="none"},6000);
 }
+function randStr(){return Math.random().toString(36).substring(2,8)}
 async function uploadFile(file,path){
   if(!file)return null;
-  var ref=storage.ref(path);
+  // Fayl kengaytmasini olamiz
+  var ext=file.name.split(".").pop()||"bin";
+  // To'liq unique path: path_timestamp_random.ext
+  var uniquePath=path+"_"+Date.now()+"_"+randStr()+"."+ext;
+  var ref=storage.ref(uniquePath);
   var snap=await ref.put(file);
   return await snap.ref.getDownloadURL();
 }
@@ -395,8 +417,8 @@ async function submitQuestion(){
     var gId=hasGroupQ?"group_"+ts.toString(36).toUpperCase():null;
     var qa=document.getElementById("qAudioFile").files[0];
     var qi=document.getElementById("qImageFile").files[0];
-    var qaUrl=await uploadFile(qa,"audio/"+ts+"_q");
-    var qiUrl=await uploadFile(qi,"images/"+ts+"_q");
+    var qaUrl=await uploadFile(qa,"audio/q");
+    var qiUrl=await uploadFile(qi,"images/q");
     var opts1=[];
     for(var i=0;i<4;i++){
       var af=document.getElementById("opt"+i+"Audio").files[0];
@@ -404,12 +426,14 @@ async function submitQuestion(){
       opts1.push({
         text:document.getElementById("opt"+i+"Text").value.trim()||null,
         fontSize:parseInt(document.getElementById("opt"+i+"FS").value),
-        audioUrl:await uploadFile(af,"audio/"+ts+"_o"+i),
-        imageUrl:await uploadFile(imf,"images/"+ts+"_o"+i)
+        audioUrl:await uploadFile(af,"audio/opt"+i),
+        imageUrl:await uploadFile(imf,"images/opt"+i)
       });
     }
     var q1={
       section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
+      topTitle:document.getElementById("topTitleText").value.trim()||null,
+      topTitleFontSize:parseInt(document.getElementById("topTitleFS").value),
       purpose:document.getElementById("purposeText").value.trim()||null,
       purposeFontSize:parseInt(document.getElementById("purposeFS").value),
       questionText:document.getElementById("questionText").value.trim()||null,
@@ -429,12 +453,14 @@ async function submitQuestion(){
         opts2.push({
           text:document.getElementById("g2opt"+j+"Text").value.trim()||null,
           fontSize:parseInt(document.getElementById("g2opt"+j+"FS").value),
-          audioUrl:await uploadFile(af2,"audio/"+ts+"_g2o"+j),
-          imageUrl:await uploadFile(imf2,"images/"+ts+"_g2o"+j)
+          audioUrl:await uploadFile(af2,"audio/g2opt"+j),
+          imageUrl:await uploadFile(imf2,"images/g2opt"+j)
         });
       }
       await db.collection("questions").add({
         section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
+        topTitle:document.getElementById("topTitleText").value.trim()||null,
+        topTitleFontSize:parseInt(document.getElementById("topTitleFS").value),
         purpose:document.getElementById("g2Purpose").value.trim()||null,
         purposeFontSize:parseInt(document.getElementById("g2PurposeFS").value),
         questionText:document.getElementById("questionText").value.trim()||null,
@@ -451,7 +477,7 @@ async function submitQuestion(){
     // Tozalash
     document.querySelectorAll("#sectionGroup .tog-btn").forEach(function(b){b.classList.remove("active-section")});
     document.querySelectorAll("#diffGroup .tog-btn").forEach(function(b){b.classList.remove("active-ve","active-e","active-m","active-am","active-h")});
-    ["purposeText","questionText"].forEach(function(id){document.getElementById(id).value=""});
+    ["topTitleText","purposeText","questionText"].forEach(function(id){document.getElementById(id).value=""});
     document.getElementById("qAudioName").textContent="";
     document.getElementById("qImgPreview").style.display="none";
     for(var k=0;k<4;k++){
@@ -521,6 +547,7 @@ function pvSelectItem(id){
 function pvRenderPhone(item){
   var opts=item.options||[];
   var html="<div style='background:#E8ECF0;border-radius:20px;padding:14px'>";
+  if(item.topTitle)html+="<div style='text-align:center;padding:10px 0 6px;margin-bottom:8px;font-size:"+(item.topTitleFontSize||26)+"px;font-weight:800;color:#4A5568;letter-spacing:1px'>"+pvFmt(item.topTitle)+"</div>";
   if(item.purpose)html+="<div style='background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;font-size:13px;color:#4A5568;text-align:center;box-shadow:3px 3px 8px #C8CDD4,-3px -3px 8px #fff;line-height:1.6'>"+pvFmt(item.purpose)+"</div>";
   if(item.questionText)html+="<div style='background:#E8ECF0;border-radius:12px;padding:12px;margin-bottom:10px;font-size:13px;color:#4A5568;box-shadow:inset 2px 2px 6px #C8CDD4,inset -2px -2px 6px #fff;line-height:1.6'>"+pvFmt(item.questionText)+"</div>";
   if(item.questionAudioUrl)html+="<div style='background:#E8ECF0;border-radius:14px;padding:10px;margin-bottom:10px;display:flex;align-items:center;gap:10px;box-shadow:4px 4px 10px #C8CDD4,-4px -4px 10px #fff'><div style='width:36px;height:36px;border-radius:50%;background:#5B6EF0;display:flex;align-items:center;justify-content:center;color:#fff'>▶</div><div style='font-size:11px;color:#5B6EF0;font-weight:600'>Audio tayyor</div></div>";
