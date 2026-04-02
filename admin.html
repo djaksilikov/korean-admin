@@ -5,6 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Korean Test — Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Sora:wght@400;600;800&display=swap" rel="stylesheet"/>
+<!-- showTab HEAD da — onclick ishlashi uchun -->
+<script>
+var pvItems=[];
+function showTab(tab){
+  var a=document.getElementById("pageAdd");
+  var p=document.getElementById("pagePreview");
+  var ba=document.getElementById("tabAdd");
+  var bp=document.getElementById("tabPreview");
+  if(!a||!p)return;
+  a.style.display=tab==="add"?"block":"none";
+  p.style.display=tab==="preview"?"block":"none";
+  ba.style.background=tab==="add"?"linear-gradient(135deg,#4f8ef7,#7c5cfc)":"transparent";
+  ba.style.border=tab==="add"?"none":"1.5px solid #2a3045";
+  ba.style.color=tab==="add"?"#fff":"#6b7280";
+  bp.style.background=tab==="preview"?"linear-gradient(135deg,#4f8ef7,#7c5cfc)":"transparent";
+  bp.style.border=tab==="preview"?"none":"1.5px solid #2a3045";
+  bp.style.color=tab==="preview"?"#fff":"#6b7280";
+  if(tab==="preview"&&typeof pvLoad==="function"&&pvItems.length===0)pvLoad();
+}
+</script>
 <style>
 :root{--bg:#0d0f14;--surface:#161a23;--surface2:#1e2330;--border:#2a3045;--accent:#4f8ef7;--accent2:#7c5cfc;--green:#2ecc71;--red:#e74c3c;--yellow:#f1c40f;--text:#e8eaf0;--muted:#6b7280;--radius:10px}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -12,7 +32,6 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 header{background:#161a23;border-bottom:1px solid var(--border);padding:18px 30px;display:flex;align-items:center;gap:14px}
 header .logo{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
 header h1{font-size:17px;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-header span{margin-left:auto;font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;background:var(--surface2);padding:4px 10px;border-radius:20px;border:1px solid var(--border)}
 .container{max-width:900px;margin:0 auto;padding:28px 20px;display:flex;flex-direction:column;gap:18px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
 .card-header{padding:13px 20px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
@@ -73,6 +92,8 @@ select:focus{border-color:var(--accent)}
 .status-msg.success{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--green);display:block}
 .status-msg.error{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:var(--red);display:block}
 .hint{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:6px}
+.pv-item{background:#161a23;border:1px solid #2a3045;border-radius:10px;padding:12px;cursor:pointer;transition:border-color 0.2s}
+.pv-item:hover,.pv-item.sel{border-color:#4f8ef7}
 </style>
 </head>
 <body>
@@ -80,13 +101,13 @@ select:focus{border-color:var(--accent)}
   <div class="logo">🇰🇷</div>
   <h1>Korean Test — Admin Panel</h1>
   <div style="display:flex;gap:8px;margin-left:auto">
-    <button id="tabAdd" onclick="showTab('add')" style="padding:7px 16px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:12px;font-weight:700;cursor:pointer">➕ Yangi savol</button>
-    <button id="tabPreview" onclick="showTab('preview')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer">👁 Ko'rinish & Tahrir</button>
+    <button id="tabAdd" onclick="showTab('add')" style="padding:7px 16px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">➕ Yangi savol</button>
+    <button id="tabPreview" onclick="showTab('preview')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">👁 Ko&#39;rinish &amp; Tahrir</button>
   </div>
 </header>
-<div id="pageAdd" class="container">
 
-  <!-- 1. Bo'lim -->
+<!-- ══ YANGI SAVOL ══ -->
+<div id="pageAdd" class="container">
   <div class="card">
     <div class="card-header"><div class="step">1</div><h2>Bo'lim tanlash</h2><span class="badge-req">majburiy</span></div>
     <div class="card-body">
@@ -98,7 +119,6 @@ select:focus{border-color:var(--accent)}
     </div>
   </div>
 
-  <!-- 2. Test turi -->
   <div class="card">
     <div class="card-header"><div class="step">2</div><h2>Test turi</h2><span class="badge-req">majburiy</span></div>
     <div class="card-body">
@@ -107,33 +127,23 @@ select:focus{border-color:var(--accent)}
         <button class="tog-btn" id="listeningBtn" onclick="selectType('Listening',this)">🎧 Listening</button>
       </div>
       <p class="hint">📖 Reading — matn o'qish &nbsp;|&nbsp; 🎧 Listening — audio tinglash</p>
-
-      <!-- Guruh tugmasi -->
       <button class="group-add-btn" id="groupAddBtn" onclick="toggleGroupBlock()">
         <span id="groupAddIcon">＋</span>
         <span id="groupAddText">Guruh savol qo'shish (bitta media uchun 2 ta savol)</span>
       </button>
-
-      <!-- 2-savol bloki -->
       <div class="group-block" id="groupBlock">
         <div class="group-block-header">
           <span>🔗 2-savol</span>
           <button class="remove-group-btn" onclick="toggleGroupBlock()">✕ Olib tashlash</button>
         </div>
         <div class="group-block-body">
-
-          <!-- ✅ 1-savol media ko'rsatkichi -->
           <div>
             <div class="sect-title">📌 1-savol audio / matn / rasm</div>
             <div class="q1-media-box">
               <div class="q1-media-title">👆 1-savoldan avtomatik olinadi</div>
-              <div class="q1-media-content" id="q1MediaContent">
-                <span style="color:var(--muted);font-size:12px">1-savolga audio, matn yoki rasm qo'shsangiz shu yerda ko'rinadi</span>
-              </div>
+              <div class="q1-media-content" id="q1MediaContent"><span style="color:var(--muted);font-size:12px">1-savolga audio, matn yoki rasm qo'shsangiz shu yerda ko'rinadi</span></div>
             </div>
           </div>
-
-          <!-- 2-savol maqsadi -->
           <div>
             <div class="sect-title">2-savol maqsadi</div>
             <div class="field-row">
@@ -141,43 +151,15 @@ select:focus{border-color:var(--accent)}
               <select id="g2PurposeFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
             </div>
           </div>
-
-          <!-- 2-savol variantlari -->
           <div>
             <div class="sect-title">2-savol variantlari</div>
-            <div class="variants-grid">
-              <div class="vcard" id="g2vcard0">
-                <div class="vcard-header"><span class="vnum">VARIANT 1</span><label class="correct-lbl"><input type="radio" name="g2correct" value="0" onchange="markCorrect2(0)"> To'g'ri ✓</label></div>
-                <div class="vfield"><label>Matn</label><div class="field-row"><textarea id="g2opt0Text" placeholder="Variant 1..." style="min-height:50px"></textarea><button type="button" onclick="wrapUnderline('g2opt0Text')" style="margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace"><u>A</u> Osti</button><select id="g2opt0FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-                <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="g2opt0Audio" accept="audio/*" onchange="showName(this,'g2opt0AudioName')"></label><div id="g2opt0AudioName" class="fname"></div></div>
-                <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="g2opt0Img" accept="image/*" onchange="showPreview(this,'g2opt0ImgPrev')"></label><img id="g2opt0ImgPrev" class="ipreview"/></div>
-              </div>
-              <div class="vcard" id="g2vcard1">
-                <div class="vcard-header"><span class="vnum">VARIANT 2</span><label class="correct-lbl"><input type="radio" name="g2correct" value="1" onchange="markCorrect2(1)"> To'g'ri ✓</label></div>
-                <div class="vfield"><label>Matn</label><div class="field-row"><textarea id="g2opt1Text" placeholder="Variant 2..." style="min-height:50px"></textarea><button type="button" onclick="wrapUnderline('g2opt1Text')" style="margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace"><u>A</u> Osti</button><select id="g2opt1FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-                <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="g2opt1Audio" accept="audio/*" onchange="showName(this,'g2opt1AudioName')"></label><div id="g2opt1AudioName" class="fname"></div></div>
-                <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="g2opt1Img" accept="image/*" onchange="showPreview(this,'g2opt1ImgPrev')"></label><img id="g2opt1ImgPrev" class="ipreview"/></div>
-              </div>
-              <div class="vcard" id="g2vcard2">
-                <div class="vcard-header"><span class="vnum">VARIANT 3</span><label class="correct-lbl"><input type="radio" name="g2correct" value="2" onchange="markCorrect2(2)"> To'g'ri ✓</label></div>
-                <div class="vfield"><label>Matn</label><div class="field-row"><textarea id="g2opt2Text" placeholder="Variant 3..." style="min-height:50px"></textarea><button type="button" onclick="wrapUnderline('g2opt2Text')" style="margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace"><u>A</u> Osti</button><select id="g2opt2FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-                <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="g2opt2Audio" accept="audio/*" onchange="showName(this,'g2opt2AudioName')"></label><div id="g2opt2AudioName" class="fname"></div></div>
-                <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="g2opt2Img" accept="image/*" onchange="showPreview(this,'g2opt2ImgPrev')"></label><img id="g2opt2ImgPrev" class="ipreview"/></div>
-              </div>
-              <div class="vcard" id="g2vcard3">
-                <div class="vcard-header"><span class="vnum">VARIANT 4</span><label class="correct-lbl"><input type="radio" name="g2correct" value="3" onchange="markCorrect2(3)"> To'g'ri ✓</label></div>
-                <div class="vfield"><label>Matn</label><div class="field-row"><textarea id="g2opt3Text" placeholder="Variant 4..." style="min-height:50px"></textarea><button type="button" onclick="wrapUnderline('g2opt3Text')" style="margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace"><u>A</u> Osti</button><select id="g2opt3FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-                <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="g2opt3Audio" accept="audio/*" onchange="showName(this,'g2opt3AudioName')"></label><div id="g2opt3AudioName" class="fname"></div></div>
-                <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="g2opt3Img" accept="image/*" onchange="showPreview(this,'g2opt3ImgPrev')"></label><img id="g2opt3ImgPrev" class="ipreview"/></div>
-              </div>
-            </div>
+            <div class="variants-grid" id="g2Grid"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 3. Qiyinlik -->
   <div class="card">
     <div class="card-header"><div class="step">3</div><h2>Qiyinlik darajasi</h2><span class="badge-req">majburiy</span></div>
     <div class="card-body">
@@ -191,25 +173,23 @@ select:focus{border-color:var(--accent)}
     </div>
   </div>
 
-  <!-- 4. Savol maqsadi -->
   <div class="card">
     <div class="card-header"><div class="step">4</div><h2>Savol maqsadi</h2><span class="badge-opt">ixtiyoriy</span></div>
     <div class="card-body">
       <div class="field-row">
         <textarea id="purposeText" placeholder="Masalan: 다음을 듣고 물음에 답하십시오."></textarea>
-        <button type="button" onclick="wrapUnderline('purposeText')" style="margin-top:6px;padding:5px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:IBM Plex Mono,monospace"><u>A</u> Osti chiziq</button>
+        <button type="button" onclick="wrapUnderline('purposeText')" style="margin-top:6px;padding:5px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:IBM Plex Mono,monospace"><u>A</u> Osti</button>
         <select id="purposeFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
       </div>
     </div>
   </div>
 
-  <!-- 5. Savol -->
   <div class="card">
     <div class="card-header"><div class="step">5</div><h2>Savol</h2><span class="badge-opt">ixtiyoriy</span></div>
     <div class="card-body">
       <div class="field-row">
         <textarea id="questionText" placeholder="Savol matnini yozing..." oninput="updateQ1Media()"></textarea>
-        <button type="button" onclick="wrapUnderline('questionText')" style="margin-top:6px;padding:5px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:IBM Plex Mono,monospace"><u>A</u> Osti chiziq</button>
+        <button type="button" onclick="wrapUnderline('questionText')" style="margin-top:6px;padding:5px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:IBM Plex Mono,monospace"><u>A</u> Osti</button>
         <select id="questionFS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select>
       </div>
       <div class="upload-row">
@@ -221,36 +201,10 @@ select:focus{border-color:var(--accent)}
     </div>
   </div>
 
-  <!-- 6. Variantlar -->
   <div class="card">
     <div class="card-header"><div class="step">6</div><h2>Variantlar</h2><span class="badge-req">majburiy</span></div>
     <div class="card-body">
-      <div class="variants-grid">
-        <div class="vcard" id="vcard0">
-          <div class="vcard-header"><span class="vnum">VARIANT 1</span><label class="correct-lbl"><input type="radio" name="correct" value="0" onchange="markCorrect(0)"> To'g'ri ✓</label></div>
-          <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt0Text" placeholder="Variant 1..." style="min-height:55px"></textarea><button type="button" onclick="wrapUnderline('opt0Text')" style="margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace"><u>A</u> Osti</button><select id="opt0FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="opt0Audio" accept="audio/*" onchange="showName(this,'opt0AudioName')"></label><div id="opt0AudioName" class="fname"></div></div>
-          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="opt0Img" accept="image/*" onchange="showPreview(this,'opt0ImgPrev')"></label><img id="opt0ImgPrev" class="ipreview"/></div>
-        </div>
-        <div class="vcard" id="vcard1">
-          <div class="vcard-header"><span class="vnum">VARIANT 2</span><label class="correct-lbl"><input type="radio" name="correct" value="1" onchange="markCorrect(1)"> To'g'ri ✓</label></div>
-          <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt1Text" placeholder="Variant 2..." style="min-height:55px"></textarea><button type="button" onclick="wrapUnderline('opt1Text')" style="margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace"><u>A</u> Osti</button><select id="opt1FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="opt1Audio" accept="audio/*" onchange="showName(this,'opt1AudioName')"></label><div id="opt1AudioName" class="fname"></div></div>
-          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="opt1Img" accept="image/*" onchange="showPreview(this,'opt1ImgPrev')"></label><img id="opt1ImgPrev" class="ipreview"/></div>
-        </div>
-        <div class="vcard" id="vcard2">
-          <div class="vcard-header"><span class="vnum">VARIANT 3</span><label class="correct-lbl"><input type="radio" name="correct" value="2" onchange="markCorrect(2)"> To'g'ri ✓</label></div>
-          <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt2Text" placeholder="Variant 3..." style="min-height:55px"></textarea><button type="button" onclick="wrapUnderline('opt2Text')" style="margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace"><u>A</u> Osti</button><select id="opt2FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="opt2Audio" accept="audio/*" onchange="showName(this,'opt2AudioName')"></label><div id="opt2AudioName" class="fname"></div></div>
-          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="opt2Img" accept="image/*" onchange="showPreview(this,'opt2ImgPrev')"></label><img id="opt2ImgPrev" class="ipreview"/></div>
-        </div>
-        <div class="vcard" id="vcard3">
-          <div class="vcard-header"><span class="vnum">VARIANT 4</span><label class="correct-lbl"><input type="radio" name="correct" value="3" onchange="markCorrect(3)"> To'g'ri ✓</label></div>
-          <div class="vfield"><label>Matn + Shrift</label><div class="field-row"><textarea id="opt3Text" placeholder="Variant 4..." style="min-height:55px"></textarea><button type="button" onclick="wrapUnderline('opt3Text')" style="margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace"><u>A</u> Osti</button><select id="opt3FS"><option value="14">Kichik</option><option value="18" selected>O'rta</option><option value="22">Katta</option></select></div></div>
-          <div class="vfield"><label>Audio</label><label class="upload-btn">🎧<input type="file" id="opt3Audio" accept="audio/*" onchange="showName(this,'opt3AudioName')"></label><div id="opt3AudioName" class="fname"></div></div>
-          <div class="vfield"><label>Rasm</label><label class="upload-btn">🖼<input type="file" id="opt3Img" accept="image/*" onchange="showPreview(this,'opt3ImgPrev')"></label><img id="opt3ImgPrev" class="ipreview"/></div>
-        </div>
-      </div>
+      <div class="variants-grid" id="optsGrid"></div>
     </div>
   </div>
 
@@ -260,25 +214,64 @@ select:focus{border-color:var(--accent)}
   </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-<script>
-// ✅ Osti chiziq funksiyasi
-function wrapUnderline(id){
-  var ta=document.getElementById(id);
-  var start=ta.selectionStart;
-  var end=ta.selectionEnd;
-  var sel=ta.value.substring(start,end);
-  if(sel.length===0){alert("Avval matnni tanlang!");return;}
-  var before=ta.value.substring(0,start);
-  var after=ta.value.substring(end);
-  ta.value=before+"__"+sel+"__"+after;
-  ta.selectionStart=start;
-  ta.selectionEnd=end+4;
-  ta.dispatchEvent(new Event("input"));
-}
+<!-- ══ KO'RINISH & TAHRIR ══ -->
+<div id="pagePreview" style="display:none;max-width:900px;margin:0 auto;padding:24px 20px">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+    <div style="font-size:14px;font-weight:800;margin-bottom:14px">🔍 Savol qidirish</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <input id="pvSearch" placeholder="Matn qidirish..." style="flex:1;min-width:160px;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none">
+      <select id="pvSection" style="padding:9px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:12px">
+        <option value="">Barcha bolim</option><option>EPS TOPIK</option><option>TOPIK 1</option><option>TOPIK 2</option>
+      </select>
+      <select id="pvType" style="padding:9px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:12px">
+        <option value="">Barcha tur</option><option value="Reading">Reading</option><option value="Listening">Listening</option>
+      </select>
+      <select id="pvDiff" style="padding:9px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:12px">
+        <option value="">Barcha qiyinlik</option><option>Very Easy</option><option>Easy</option><option>Medium</option><option>Above Medium</option><option>Hard</option>
+      </select>
+      <button onclick="pvLoad()" style="padding:9px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:13px;font-weight:700;cursor:pointer">🔍 Qidirish</button>
+    </div>
+    <div id="pvStatus" style="font-size:12px;color:var(--muted)"></div>
+  </div>
 
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px;font-family:'IBM Plex Mono',monospace">Savollar</div>
+      <div id="pvList" style="display:flex;flex-direction:column;gap:8px;max-height:620px;overflow-y:auto">
+        <div style="color:var(--muted);font-size:13px;text-align:center;padding:30px">Qidirish tugmasini bosing</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px;font-family:'IBM Plex Mono',monospace">Ilova ko'rinishi</div>
+      <div id="pvPhone" style="background:#E8ECF0;border-radius:28px;padding:16px;min-height:300px;box-shadow:6px 6px 14px #C8CDD4,-6px -6px 14px #fff">
+        <div style="color:#8E97A5;font-size:12px;text-align:center;padding:40px 0">Savol tanlang</div>
+      </div>
+      <div id="pvEditPanel" style="display:none;margin-top:16px;background:var(--surface2);border:1.5px solid var(--accent);border-radius:14px;padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span style="font-size:14px;font-weight:800">✏️ Tahrirlash</span>
+          <button id="pvDelBtn" style="padding:5px 12px;border-radius:6px;border:none;background:#c0392b;color:#fff;font-size:12px;cursor:pointer">🗑 Ochirish</button>
+        </div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">MAQSAD</label>
+        <textarea id="pvPurpose" style="min-height:44px;margin-bottom:10px"></textarea>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">SAVOL MATNI</label>
+        <textarea id="pvQText" style="min-height:44px;margin-bottom:10px"></textarea>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">TOGRI JAVOB</label>
+        <select id="pvCorrect" style="width:100%;margin-bottom:10px">
+          <option value="0">① 1-variant</option><option value="1">② 2-variant</option>
+          <option value="2">③ 3-variant</option><option value="3">④ 4-variant</option>
+        </select>
+        <div id="pvOptsEdit" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"></div>
+        <div id="pvSaveStatus" style="font-size:12px;margin-bottom:8px;min-height:18px"></div>
+        <button id="pvSaveBtn" style="width:100%;padding:11px;border-radius:8px;border:none;background:#27ae60;color:#fff;font-size:13px;font-weight:700;cursor:pointer">💾 Saqlash</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
 firebase.initializeApp({
   apiKey:"AIzaSyAOgwoxezdtV89KTdapbVHqzYjjt61_Cfk",
   authDomain:"koreantestapp.firebaseapp.com",
@@ -289,111 +282,97 @@ firebase.initializeApp({
 });
 var db=firebase.firestore();
 var storage=firebase.storage();
-var selectedTestType='Reading';
+var selectedTestType="Reading";
 var hasGroupQ=false;
+var NUMS=["①","②","③","④"];
 
+// Variantlar gridlarini render qilamiz
+function buildOptsGrid(containerId,namePrefix,radioName){
+  var el=document.getElementById(containerId);
+  el.innerHTML=NUMS.map(function(num,i){
+    return "<div class='vcard' id='"+namePrefix+"vcard"+i+"'>"+
+      "<div class='vcard-header'><span class='vnum'>VARIANT "+(i+1)+"</span>"+
+      "<label class='correct-lbl'><input type='radio' name='"+radioName+"' value='"+i+"' onchange=\"markCorrect('"+namePrefix+"',"+i+")\"> To&#39;g&#39;ri ✓</label></div>"+
+      "<div class='vfield'><label>Matn</label><div class='field-row'>"+
+      "<textarea id='"+namePrefix+"opt"+i+"Text' placeholder='Variant "+(i+1)+"...' style='min-height:50px'></textarea>"+
+      "<button type='button' onclick=\"wrapUnderline('"+namePrefix+"opt"+i+"Text')\" style='margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:IBM Plex Mono,monospace'><u>A</u></button>"+
+      "<select id='"+namePrefix+"opt"+i+"FS'><option value='14'>Kichik</option><option value='18' selected>Orta</option><option value='22'>Katta</option></select></div></div>"+
+      "<div class='vfield'><label>Audio</label><label class='upload-btn'>🎧<input type='file' id='"+namePrefix+"opt"+i+"Audio' accept='audio/*' onchange=\"showName(this,'"+namePrefix+"opt"+i+"AudioName')\"></label><div id='"+namePrefix+"opt"+i+"AudioName' class='fname'></div></div>"+
+      "<div class='vfield'><label>Rasm</label><label class='upload-btn'>🖼<input type='file' id='"+namePrefix+"opt"+i+"Img' accept='image/*' onchange=\"showPreview(this,'"+namePrefix+"opt"+i+"ImgPrev')\"></label><img id='"+namePrefix+"opt"+i+"ImgPrev' class='ipreview'/></div>"+
+      "</div>";
+  }).join("");
+}
+
+window.addEventListener("DOMContentLoaded",function(){
+  buildOptsGrid("optsGrid","","correct");
+  buildOptsGrid("g2Grid","g2","g2correct");
+});
+
+function markCorrect(prefix,idx){
+  for(var i=0;i<4;i++){
+    var el=document.getElementById(prefix+"vcard"+i);
+    if(el) el.className="vcard"+(i===idx?" correct-selected":"");
+  }
+}
+function wrapUnderline(id){
+  var ta=document.getElementById(id);
+  var s=ta.selectionStart,e=ta.selectionEnd;
+  var sel=ta.value.substring(s,e);
+  if(!sel.length){alert("Avval matnni tanlang!");return}
+  ta.value=ta.value.substring(0,s)+"__"+sel+"__"+ta.value.substring(e);
+  ta.selectionStart=s;ta.selectionEnd=e+4;
+  ta.dispatchEvent(new Event("input"));
+}
 function selectSection(btn){
-  document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});
-  btn.classList.add('active-section');
+  document.querySelectorAll("#sectionGroup .tog-btn").forEach(function(b){b.classList.remove("active-section")});
+  btn.classList.add("active-section");
 }
 function selectType(type,btn){
   selectedTestType=type;
-  document.getElementById('readingBtn').classList.remove('active-reading','active-listening');
-  document.getElementById('listeningBtn').classList.remove('active-reading','active-listening');
-  btn.classList.add(type==='Reading'?'active-reading':'active-listening');
+  document.getElementById("readingBtn").classList.remove("active-reading","active-listening");
+  document.getElementById("listeningBtn").classList.remove("active-reading","active-listening");
+  btn.classList.add(type==="Reading"?"active-reading":"active-listening");
 }
 function selectDiff(btn){
-  document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){
-    b.classList.remove('active-ve','active-e','active-m','active-am','active-h')
+  document.querySelectorAll("#diffGroup .tog-btn").forEach(function(b){
+    b.classList.remove("active-ve","active-e","active-m","active-am","active-h");
   });
   btn.classList.add(btn.dataset.cls);
 }
-
-// ✅ 1-savol mediasini 2-savol blokida ko'rsatish
 function updateQ1Media(){
   if(!hasGroupQ)return;
-  var content=document.getElementById('q1MediaContent');
-  var html='';
-  var qtext=document.getElementById('questionText').value.trim();
-  var audioFile=document.getElementById('qAudioFile').files[0];
-  var imgEl=document.getElementById('qImgPreview');
-
-  if(audioFile){
-    html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border-radius:8px;margin-bottom:6px">'+
-      '<span style="font-size:18px">🎧</span>'+
-      '<span style="color:var(--green);font-size:12px;font-family:IBM Plex Mono,monospace">'+audioFile.name+'</span>'+
-    '</div>';
-  }
-  if(qtext){
-    html+='<div style="padding:8px 12px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-size:13px">'+qtext+'</div>';
-  }
-  if(imgEl.src&&imgEl.style.display!=='none'){
-    html+='<img src="'+imgEl.src+'" style="max-width:100%;max-height:160px;border-radius:8px;margin-top:4px;display:block"/>';
-  }
-  if(!html){
-    html='<span style="color:var(--muted);font-size:12px">1-savolga audio, matn yoki rasm qo\'shsangiz shu yerda ko\'rinadi</span>';
-  }
-  content.innerHTML=html;
+  var el=document.getElementById("q1MediaContent");
+  var html="";
+  var qt=document.getElementById("questionText").value.trim();
+  var af=document.getElementById("qAudioFile").files[0];
+  var img=document.getElementById("qImgPreview");
+  if(af)html+="<div style='padding:8px;background:rgba(39,174,96,0.1);border-radius:8px;margin-bottom:6px'>🎧 "+af.name+"</div>";
+  if(qt)html+="<div style='padding:8px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-size:13px'>"+qt+"</div>";
+  if(img.src&&img.style.display!=="none")html+="<img src='"+img.src+"' style='max-width:100%;max-height:100px;border-radius:8px'>";
+  if(!html)html="<span style='color:var(--muted);font-size:12px'>1-savolga media qoshsangiz shu yerda korinadi</span>";
+  el.innerHTML=html;
 }
-
 function toggleGroupBlock(){
   hasGroupQ=!hasGroupQ;
-  var block=document.getElementById('groupBlock');
-  var icon=document.getElementById('groupAddIcon');
-  var text=document.getElementById('groupAddText');
-  var btn=document.getElementById('groupAddBtn');
-  if(hasGroupQ){
-    block.classList.add('show');
-    icon.textContent='✕';
-    text.textContent='Guruh savolni olib tashlash';
-    btn.style.borderColor='var(--red)';
-    btn.style.color='var(--red)';
-    updateQ1Media();
-  }else{
-    block.classList.remove('show');
-    icon.textContent='＋';
-    text.textContent='Guruh savol qo\'shish (bitta media uchun 2 ta savol)';
-    btn.style.borderColor='';
-    btn.style.color='';
-    clearGroup2();
-  }
+  document.getElementById("groupBlock").classList.toggle("show",hasGroupQ);
+  document.getElementById("groupAddIcon").textContent=hasGroupQ?"✕":"＋";
+  document.getElementById("groupAddText").textContent=hasGroupQ?"Guruh savolni olib tashlash":"Guruh savol qoshish (bitta media uchun 2 ta savol)";
+  document.getElementById("groupAddBtn").style.borderColor=hasGroupQ?"var(--red)":"";
+  document.getElementById("groupAddBtn").style.color=hasGroupQ?"var(--red)":"";
+  if(hasGroupQ)updateQ1Media();
 }
-
-function clearGroup2(){
-  document.getElementById('g2Purpose').value='';
-  for(var i=0;i<4;i++){
-    document.getElementById('g2opt'+i+'Text').value='';
-    document.getElementById('g2opt'+i+'Audio').value='';
-    document.getElementById('g2opt'+i+'Img').value='';
-    document.getElementById('g2opt'+i+'AudioName').textContent='';
-    document.getElementById('g2opt'+i+'ImgPrev').style.display='none';
-    document.getElementById('g2vcard'+i).classList.remove('correct-selected');
-  }
-  document.querySelectorAll('input[name="g2correct"]').forEach(function(r){r.checked=false});
-}
-
-function markCorrect(idx){
-  for(var i=0;i<4;i++)document.getElementById('vcard'+i).classList.remove('correct-selected');
-  document.getElementById('vcard'+idx).classList.add('correct-selected');
-}
-function markCorrect2(idx){
-  for(var i=0;i<4;i++)document.getElementById('g2vcard'+i).classList.remove('correct-selected');
-  document.getElementById('g2vcard'+idx).classList.add('correct-selected');
-}
-function showName(input,targetId){
-  if(input.files[0])document.getElementById(targetId).textContent='✅ '+input.files[0].name;
-}
-function showPreview(input,targetId){
+function showName(input,id){if(input.files[0])document.getElementById(id).textContent="✅ "+input.files[0].name}
+function showPreview(input,id){
   if(input.files[0]){
     var r=new FileReader();
-    r.onload=function(e){var img=document.getElementById(targetId);img.src=e.target.result;img.style.display='block'};
+    r.onload=function(e){var img=document.getElementById(id);img.src=e.target.result;img.style.display="block"};
     r.readAsDataURL(input.files[0]);
   }
 }
 function showStatus(msg,type){
-  var el=document.getElementById('statusMsg');
-  el.textContent=msg;el.className='status-msg '+type;el.style.display='block';
-  setTimeout(function(){el.style.display='none'},6000);
+  var el=document.getElementById("statusMsg");
+  el.textContent=msg;el.className="status-msg "+type;
+  setTimeout(function(){el.style.display="none"},6000);
 }
 async function uploadFile(file,path){
   if(!file)return null;
@@ -401,187 +380,213 @@ async function uploadFile(file,path){
   var snap=await ref.put(file);
   return await snap.ref.getDownloadURL();
 }
-
 async function submitQuestion(){
-  var btn=document.getElementById('submitBtn');
-  var section=document.querySelector('#sectionGroup .tog-btn.active-section');
-  var diff=document.querySelector('#diffGroup .tog-btn[class*="active-ve"],#diffGroup .tog-btn[class*="active-e"],#diffGroup .tog-btn[class*="active-m"],#diffGroup .tog-btn[class*="active-am"],#diffGroup .tog-btn[class*="active-h"]');
-  var correctRadio=document.querySelector('input[name="correct"]:checked');
-  if(!section){showStatus('❌ Bo\'lim tanlang!','error');return}
-  if(!diff){showStatus('❌ Qiyinlik darajasini tanlang!','error');return}
-  if(!correctRadio){showStatus('❌ 1-savol to\'g\'ri javobni belgilang!','error');return}
-  if(hasGroupQ&&!document.querySelector('input[name="g2correct"]:checked')){
-    showStatus('❌ 2-savol to\'g\'ri javobni belgilang!','error');return
-  }
-  btn.disabled=true;btn.textContent='⏳ Yuklanmoqda...';
+  var btn=document.getElementById("submitBtn");
+  var section=document.querySelector("#sectionGroup .tog-btn.active-section");
+  var diff=document.querySelector("#diffGroup .tog-btn[class*='active-ve'],#diffGroup .tog-btn[class*='active-e'],#diffGroup .tog-btn[class*='active-m'],#diffGroup .tog-btn[class*='active-am'],#diffGroup .tog-btn[class*='active-h']");
+  var cor=document.querySelector("input[name='correct']:checked");
+  if(!section){showStatus("Bolim tanlang!","error");return}
+  if(!diff){showStatus("Qiyinlik tanlang!","error");return}
+  if(!cor){showStatus("1-savol togri javobni belgilang!","error");return}
+  if(hasGroupQ&&!document.querySelector("input[name='g2correct']:checked")){showStatus("2-savol togri javobni belgilang!","error");return}
+  btn.disabled=true;btn.textContent="Yuklanmoqda...";
   try{
     var ts=Date.now();
-    var groupId=hasGroupQ?'group_'+ts.toString(36).toUpperCase():null;
-
-    // 1-savol
-    var qa=document.getElementById('qAudioFile').files[0];
-    var qi=document.getElementById('qImageFile').files[0];
-    var qaUrl=await uploadFile(qa,'audio/'+ts+'_q1_'+(qa?qa.name:''));
-    var qiUrl=await uploadFile(qi,'images/'+ts+'_q1_'+(qi?qi.name:''));
+    var gId=hasGroupQ?"group_"+ts.toString(36).toUpperCase():null;
+    var qa=document.getElementById("qAudioFile").files[0];
+    var qi=document.getElementById("qImageFile").files[0];
+    var qaUrl=await uploadFile(qa,"audio/"+ts+"_q");
+    var qiUrl=await uploadFile(qi,"images/"+ts+"_q");
     var opts1=[];
     for(var i=0;i<4;i++){
-      var af=document.getElementById('opt'+i+'Audio').files[0];
-      var imf=document.getElementById('opt'+i+'Img').files[0];
+      var af=document.getElementById("opt"+i+"Audio").files[0];
+      var imf=document.getElementById("opt"+i+"Img").files[0];
       opts1.push({
-        text:document.getElementById('opt'+i+'Text').value.trim()||null,
-        fontSize:parseInt(document.getElementById('opt'+i+'FS').value),
-        audioUrl:await uploadFile(af,'audio/'+ts+'_q1o'+i+'_'+(af?af.name:'')),
-        imageUrl:await uploadFile(imf,'images/'+ts+'_q1o'+i+'_'+(imf?imf.name:''))
+        text:document.getElementById("opt"+i+"Text").value.trim()||null,
+        fontSize:parseInt(document.getElementById("opt"+i+"FS").value),
+        audioUrl:await uploadFile(af,"audio/"+ts+"_o"+i),
+        imageUrl:await uploadFile(imf,"images/"+ts+"_o"+i)
       });
     }
     var q1={
       section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
-      purpose:document.getElementById('purposeText').value.trim()||null,
-      purposeFontSize:parseInt(document.getElementById('purposeFS').value),
-      questionText:document.getElementById('questionText').value.trim()||null,
-      questionFontSize:parseInt(document.getElementById('questionFS').value),
+      purpose:document.getElementById("purposeText").value.trim()||null,
+      purposeFontSize:parseInt(document.getElementById("purposeFS").value),
+      questionText:document.getElementById("questionText").value.trim()||null,
+      questionFontSize:parseInt(document.getElementById("questionFS").value),
       questionAudioUrl:qaUrl,questionImageUrl:qiUrl,
-      options:opts1,correctIndex:parseInt(correctRadio.value),
+      options:opts1,correctIndex:parseInt(cor.value),
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     };
-    if(groupId){q1.groupId=groupId;q1.groupOrder=1}
-    await db.collection('questions').add(q1);
-
-    // 2-savol — 1-savolning audio/matn/rasmi meros olinadi
+    if(gId){q1.groupId=gId;q1.groupOrder=1}
+    await db.collection("questions").add(q1);
     if(hasGroupQ){
+      var g2c=document.querySelector("input[name='g2correct']:checked");
       var opts2=[];
       for(var j=0;j<4;j++){
-        var af2=document.getElementById('g2opt'+j+'Audio').files[0];
-        var imf2=document.getElementById('g2opt'+j+'Img').files[0];
+        var af2=document.getElementById("g2opt"+j+"Audio").files[0];
+        var imf2=document.getElementById("g2opt"+j+"Img").files[0];
         opts2.push({
-          text:document.getElementById('g2opt'+j+'Text').value.trim()||null,
-          fontSize:parseInt(document.getElementById('g2opt'+j+'FS').value),
-          audioUrl:await uploadFile(af2,'audio/'+ts+'_q2o'+j+'_'+(af2?af2.name:'')),
-          imageUrl:await uploadFile(imf2,'images/'+ts+'_q2o'+j+'_'+(imf2?imf2.name:''))
+          text:document.getElementById("g2opt"+j+"Text").value.trim()||null,
+          fontSize:parseInt(document.getElementById("g2opt"+j+"FS").value),
+          audioUrl:await uploadFile(af2,"audio/"+ts+"_g2o"+j),
+          imageUrl:await uploadFile(imf2,"images/"+ts+"_g2o"+j)
         });
       }
-      var g2c=document.querySelector('input[name="g2correct"]:checked');
-      var q2={
+      await db.collection("questions").add({
         section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
-        // ✅ Faqat 2-savol maqsadi o'zgaradi
-        purpose:document.getElementById('g2Purpose').value.trim()||null,
-        purposeFontSize:parseInt(document.getElementById('g2PurposeFS').value),
-        // ✅ 1-savol text/audio/rasm meros olinadi
-        questionText:document.getElementById('questionText').value.trim()||null,
-        questionFontSize:parseInt(document.getElementById('questionFS').value),
-        questionAudioUrl:qaUrl,
-        questionImageUrl:qiUrl,
+        purpose:document.getElementById("g2Purpose").value.trim()||null,
+        purposeFontSize:parseInt(document.getElementById("g2PurposeFS").value),
+        questionText:document.getElementById("questionText").value.trim()||null,
+        questionFontSize:parseInt(document.getElementById("questionFS").value),
+        questionAudioUrl:qaUrl,questionImageUrl:qiUrl,
         options:opts2,correctIndex:parseInt(g2c.value),
-        groupId:groupId,groupOrder:2,
+        groupId:gId,groupOrder:2,
         createdAt:firebase.firestore.FieldValue.serverTimestamp()
-      };
-      await db.collection('questions').add(q2);
-      showStatus('✅ 2 ta savol saqlandi! Guruh: '+groupId,'success');
+      });
+      showStatus("2 ta savol saqlandi! Guruh: "+gId,"success");
     }else{
-      showStatus('✅ Savol saqlandi! ('+selectedTestType+')','success');
+      showStatus("Savol saqlandi! ("+selectedTestType+")","success");
     }
-
     // Tozalash
-    document.querySelectorAll('#sectionGroup .tog-btn').forEach(function(b){b.classList.remove('active-section')});
-    document.querySelectorAll('#diffGroup .tog-btn').forEach(function(b){b.classList.remove('active-ve','active-e','active-m','active-am','active-h')});
-    document.getElementById('purposeText').value='';
-    document.getElementById('questionText').value='';
-    document.getElementById('qAudioFile').value='';
-    document.getElementById('qImageFile').value='';
-    document.getElementById('qAudioName').textContent='';
-    document.getElementById('qImgPreview').style.display='none';
+    document.querySelectorAll("#sectionGroup .tog-btn").forEach(function(b){b.classList.remove("active-section")});
+    document.querySelectorAll("#diffGroup .tog-btn").forEach(function(b){b.classList.remove("active-ve","active-e","active-m","active-am","active-h")});
+    ["purposeText","questionText"].forEach(function(id){document.getElementById(id).value=""});
+    document.getElementById("qAudioName").textContent="";
+    document.getElementById("qImgPreview").style.display="none";
     for(var k=0;k<4;k++){
-      document.getElementById('opt'+k+'Text').value='';
-      document.getElementById('opt'+k+'Audio').value='';
-      document.getElementById('opt'+k+'Img').value='';
-      document.getElementById('opt'+k+'AudioName').textContent='';
-      document.getElementById('opt'+k+'ImgPrev').style.display='none';
-      document.getElementById('vcard'+k).classList.remove('correct-selected');
+      document.getElementById("opt"+k+"Text").value="";
+      document.getElementById("opt"+k+"AudioName").textContent="";
+      document.getElementById("opt"+k+"ImgPrev").style.display="none";
+      document.getElementById("vcard"+k+"").className="vcard";
     }
-    document.querySelectorAll('input[name="correct"]').forEach(function(r){r.checked=false});
-    selectType('Reading',document.getElementById('readingBtn'));
+    document.querySelectorAll("input[name='correct']").forEach(function(r){r.checked=false});
+    selectType("Reading",document.getElementById("readingBtn"));
     if(hasGroupQ)toggleGroupBlock();
-  }catch(err){
-    console.error(err);
-    showStatus('❌ Xatolik: '+err.message,'error');
+  }catch(err){showStatus("Xatolik: "+err.message,"error")}
+  btn.disabled=false;btn.textContent="🚀 Firebase ga yuborish";
+}
+
+// ══ KO'RINISH & TAHRIR ══
+function pvFmt(txt){
+  if(!txt)return "";
+  txt=txt.replace(/__([^_]+)__/g,"<u style='color:#5B6EF0'>$1</u>");
+  txt=txt.replace(/_{5,}/g,"<u style='color:#5B6EF0;display:inline-block;min-width:80px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>");
+  txt=txt.replace(/_{3,4}/g,"<u style='color:#5B6EF0;display:inline-block;min-width:50px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>");
+  return txt;
+}
+function pvLoad(){
+  var q=document.getElementById("pvSearch").value.toLowerCase().trim();
+  var sec=document.getElementById("pvSection").value;
+  var type=document.getElementById("pvType").value;
+  var diff=document.getElementById("pvDiff").value;
+  var el=document.getElementById("pvList");
+  el.innerHTML="<div style='color:var(--muted);font-size:13px;text-align:center;padding:30px'>Yuklanmoqda...</div>";
+  db.collection("questions").orderBy("createdAt","desc").limit(200).get().then(function(snap){
+    var all=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
+    pvItems=all.filter(function(item){
+      if(sec&&item.section!==sec)return false;
+      if(type&&item.testType!==type)return false;
+      if(diff&&item.difficulty!==diff)return false;
+      if(q){var txt=(item.purpose||"")+(item.questionText||"");if(txt.toLowerCase().indexOf(q)===-1)return false}
+      return true;
+    });
+    document.getElementById("pvStatus").textContent=pvItems.length+" ta savol topildi";
+    if(!pvItems.length){el.innerHTML="<div style='color:var(--muted);font-size:13px;text-align:center;padding:30px'>Topilmadi</div>";return}
+    el.innerHTML=pvItems.map(function(item){
+      var sc={"EPS TOPIK":"#4f8ef7","TOPIK 1":"#2ecc71","TOPIK 2":"#f1c40f"}[item.section]||"#6b7280";
+      var txt=(item.purpose||item.questionText||"—").substring(0,70);
+      return "<div class='pv-item' data-id='"+item._id+"'>"+
+        "<div style='display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px'>"+
+        "<span style='background:rgba(79,142,247,0.15);color:"+sc+";font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px'>"+item.section+"</span>"+
+        "<span style='background:var(--surface2);color:var(--muted);font-size:10px;padding:2px 7px;border-radius:10px'>"+(item.testType||"Reading")+"</span>"+
+        "<span style='background:var(--surface2);color:var(--muted);font-size:10px;padding:2px 7px;border-radius:10px'>"+(item.difficulty||"Easy")+"</span>"+
+        "</div><div style='font-size:12px;color:var(--text);line-height:1.5'>"+txt+"</div></div>";
+    }).join("");
+    el.querySelectorAll(".pv-item").forEach(function(card){
+      card.addEventListener("click",function(){
+        el.querySelectorAll(".pv-item").forEach(function(c){c.classList.remove("sel")});
+        this.classList.add("sel");
+        pvSelectItem(this.getAttribute("data-id"));
+      });
+    });
+  }).catch(function(e){el.innerHTML="<div style='color:var(--red);padding:20px'>Xato: "+e.message+"</div>"});
+}
+function pvSelectItem(id){
+  var item=pvItems.find(function(q){return q._id===id});
+  if(!item)return;
+  pvRenderPhone(item);
+  pvRenderEdit(item);
+}
+function pvRenderPhone(item){
+  var opts=item.options||[];
+  var html="<div style='background:#E8ECF0;border-radius:20px;padding:14px'>";
+  if(item.purpose)html+="<div style='background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;font-size:13px;color:#4A5568;text-align:center;box-shadow:3px 3px 8px #C8CDD4,-3px -3px 8px #fff;line-height:1.6'>"+pvFmt(item.purpose)+"</div>";
+  if(item.questionText)html+="<div style='background:#E8ECF0;border-radius:12px;padding:12px;margin-bottom:10px;font-size:13px;color:#4A5568;box-shadow:inset 2px 2px 6px #C8CDD4,inset -2px -2px 6px #fff;line-height:1.6'>"+pvFmt(item.questionText)+"</div>";
+  if(item.questionAudioUrl)html+="<div style='background:#E8ECF0;border-radius:14px;padding:10px;margin-bottom:10px;display:flex;align-items:center;gap:10px;box-shadow:4px 4px 10px #C8CDD4,-4px -4px 10px #fff'><div style='width:36px;height:36px;border-radius:50%;background:#5B6EF0;display:flex;align-items:center;justify-content:center;color:#fff'>▶</div><div style='font-size:11px;color:#5B6EF0;font-weight:600'>Audio tayyor</div></div>";
+  if(item.questionImageUrl)html+="<img src='"+item.questionImageUrl+"' style='width:100%;border-radius:10px;margin-bottom:10px;max-height:120px;object-fit:contain'>";
+  opts.forEach(function(opt,i){
+    var isC=item.correctIndex===i;
+    html+="<div style='border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;"+(isC?"background:rgba(72,187,120,0.1);border:1.5px solid #48BB78":"background:#E8ECF0;box-shadow:3px 3px 7px #C8CDD4,-3px -3px 7px #fff")+"'>"+
+      "<div style='width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;"+(isC?"background:#48BB78;color:#fff":"background:#E8ECF0;color:#4A5568;box-shadow:2px 2px 5px #C8CDD4,-2px -2px 5px #fff")+"'>"+NUMS[i]+"</div>"+
+      "<div style='font-size:13px;color:#4A5568;flex:1'>"+pvFmt(opt.text||"—")+"</div>"+
+      (isC?"<span style='color:#48BB78;font-size:16px'>✓</span>":"")+
+      "</div>";
+  });
+  document.getElementById("pvPhone").innerHTML=html+"</div>";
+}
+function pvRenderEdit(item){
+  var opts=item.options||[];
+  document.getElementById("pvPurpose").value=item.purpose||"";
+  document.getElementById("pvQText").value=item.questionText||"";
+  document.getElementById("pvCorrect").value=String(item.correctIndex||0);
+  var oh="";
+  for(var i=0;i<4;i++){
+    var opt=opts[i]||{};
+    oh+="<div style='background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px'>"+
+      "<div style='font-size:11px;color:var(--accent);font-weight:700;margin-bottom:6px'>"+NUMS[i]+"</div>"+
+      "<textarea id='pvOpt"+i+"' style='min-height:36px'>"+(opt.text||"")+"</textarea></div>";
   }
-  btn.disabled=false;btn.textContent='🚀 Firebase ga yuborish';
+  document.getElementById("pvOptsEdit").innerHTML=oh;
+  document.getElementById("pvSaveBtn").onclick=function(){pvSave(item._id)};
+  document.getElementById("pvDelBtn").onclick=function(){pvDelete(item._id)};
+  document.getElementById("pvEditPanel").style.display="block";
+  document.getElementById("pvSaveStatus").textContent="";
+  document.getElementById("pvEditPanel").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+async function pvSave(id){
+  var item=pvItems.find(function(q){return q._id===id});
+  if(!item)return;
+  document.getElementById("pvSaveStatus").innerHTML="<span style='color:var(--yellow)'>Saqlanmoqda...</span>";
+  var update={};
+  update.purpose=document.getElementById("pvPurpose").value.trim()||null;
+  update.questionText=document.getElementById("pvQText").value.trim()||null;
+  update.correctIndex=parseInt(document.getElementById("pvCorrect").value);
+  var opts=item.options?JSON.parse(JSON.stringify(item.options)):Array(4).fill({});
+  for(var i=0;i<4;i++){
+    if(!opts[i])opts[i]={};
+    var t=document.getElementById("pvOpt"+i);
+    if(t)opts[i].text=t.value.trim();
+  }
+  update.options=opts;
+  db.collection("questions").doc(id).update(update)
+    .then(function(){
+      document.getElementById("pvSaveStatus").innerHTML="<span style='color:var(--green)'>Saqlandi!</span>";
+      Object.assign(item,update);
+      pvRenderPhone(item);
+    })
+    .catch(function(e){
+      document.getElementById("pvSaveStatus").innerHTML="<span style='color:var(--red)'>Xato: "+e.message+"</span>";
+    });
+}
+function pvDelete(id){
+  if(!confirm("Rostdan ochirasizmi?"))return;
+  db.collection("questions").doc(id).delete().then(function(){
+    document.getElementById("pvEditPanel").style.display="none";
+    document.getElementById("pvPhone").innerHTML="<div style='color:#8E97A5;font-size:12px;text-align:center;padding:40px 0'>Savol ochirildi</div>";
+    pvLoad();
+  });
 }
 </script>
-
-<div id="pagePreview" style="display:none;max-width:900px;margin:0 auto;padding:24px 20px">
-
-  <!-- Qidiruv -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
-    <div style="font-size:14px;font-weight:800;margin-bottom:14px">🔍 Savol qidirish</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      <input id="pvSearch" placeholder="Matn bo'yicha qidirish..." style="flex:1;min-width:180px;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
-      <select id="pvSection" style="padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
-        <option value="">Barcha bo'lim</option>
-        <option>EPS TOPIK</option><option>TOPIK 1</option><option>TOPIK 2</option>
-      </select>
-      <select id="pvType" style="padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
-        <option value="">Barcha tur</option>
-        <option value="Reading">📖 Reading</option>
-        <option value="Listening">🎧 Listening</option>
-      </select>
-      <select id="pvDiff" style="padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
-        <option value="">Barcha qiyinlik</option>
-        <option>Very Easy</option><option>Easy</option><option>Medium</option><option>Above Medium</option><option>Hard</option>
-      </select>
-      <button onclick="pvLoad()" style="padding:9px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:13px;font-weight:700;cursor:pointer">🔍 Qidirish</button>
-    </div>
-    <div id="pvStatus" style="font-size:12px;color:#6b7280;font-family:'IBM Plex Mono',monospace"></div>
-  </div>
-
-  <!-- So'nggi savollar + qidiruv natijalari -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-
-    <!-- Chap: ro'yxat -->
-    <div>
-      <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;font-family:'IBM Plex Mono',monospace">Savollar</div>
-      <div id="pvList" style="display:flex;flex-direction:column;gap:8px;max-height:600px;overflow-y:auto">
-        <div style="color:#6b7280;font-size:13px;text-align:center;padding:30px">Yuklash uchun 🔍 bosing</div>
-      </div>
-    </div>
-
-    <!-- O'ng: ilova ko'rinishi -->
-    <div>
-      <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;font-family:'IBM Plex Mono',monospace">Ilova ko'rinishi</div>
-      <div id="pvPhone" style="background:#E8ECF0;border-radius:28px;padding:16px;min-height:400px;box-shadow:6px 6px 14px #C8CDD4,-6px -6px 14px #fff">
-        <div style="color:#8E97A5;font-size:12px;text-align:center;padding:40px 0">Savol tanlang</div>
-      </div>
-
-      <!-- Tahrirlash paneli -->
-      <div id="pvEditPanel" style="display:none;margin-top:16px;background:#1e2330;border:1.5px solid #4f8ef7;border-radius:14px;padding:20px">
-        <div style="font-size:14px;font-weight:800;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
-          <span>✏️ Tahrirlash</span>
-          <button id="pvDelBtn" style="padding:5px 12px;border-radius:6px;border:none;background:#c0392b;color:#fff;font-size:12px;cursor:pointer">🗑 O'chirish</button>
-        </div>
-        <div style="margin-bottom:10px">
-          <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">SAVOL MAQSADI</label>
-          <textarea id="pvPurpose" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #2a3045;background:#0d0f14;color:#e8eaf0;font-size:13px;resize:vertical;min-height:50px"></textarea>
-        </div>
-        <div style="margin-bottom:10px">
-          <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">SAVOL MATNI</label>
-          <textarea id="pvQText" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #2a3045;background:#0d0f14;color:#e8eaf0;font-size:13px;resize:vertical;min-height:50px"></textarea>
-        </div>
-        <div style="margin-bottom:10px">
-          <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">TO'G'RI JAVOB</label>
-          <select id="pvCorrect" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #2a3045;background:#0d0f14;color:#e8eaf0;font-size:13px">
-            <option value="0">① 1-variant</option>
-            <option value="1">② 2-variant</option>
-            <option value="2">③ 3-variant</option>
-            <option value="3">④ 4-variant</option>
-          </select>
-        </div>
-        <div id="pvOptsEdit" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"></div>
-        <div id="pvSaveStatus" style="font-size:12px;margin-bottom:8px"></div>
-        <button id="pvSaveBtn" style="width:100%;padding:11px;border-radius:8px;border:none;background:#27ae60;color:#fff;font-size:13px;font-weight:700;cursor:pointer">💾 Saqlash</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
