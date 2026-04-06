@@ -610,15 +610,33 @@ async function submitQuestion(){
     ["purposeText","questionText"].forEach(function(id){document.getElementById(id).value="";});
     document.getElementById("qAudioName").textContent="";
     document.getElementById("qImgPreview").style.display="none";
+    // Barcha file inputlarni tozalaymiz
+    var fileInputs=document.querySelectorAll("#optsGrid input[type=file],#pageAdd input[type=file]");
+    fileInputs.forEach(function(inp){inp.value="";});
+    document.getElementById("qAudioFile").value="";
+    document.getElementById("qImageFile").value="";
     for(var k=0;k<4;k++){
       document.getElementById("opt"+k+"Text").value="";
       document.getElementById("opt"+k+"AudioName").textContent="";
-      document.getElementById("opt"+k+"ImgPrev").style.display="none";
+      var imgPrev=document.getElementById("opt"+k+"ImgPrev");
+      if(imgPrev){imgPrev.style.display="none";imgPrev.src="";}
       document.getElementById("vcard"+k).className="vcard";
+      // Shablon selectni ham reset
+      var tplSel=document.getElementById("opt"+k+"Tpl");
+      if(tplSel)tplSel.value="";
     }
+    // purposeTpl ni reset
+    var pTpl=document.getElementById("purposeTpl");
+    if(pTpl)pTpl.value="";
+    var pPreview=document.getElementById("purposeTplPreview");
+    if(pPreview)pPreview.style.display="none";
     document.querySelectorAll("input[name='correct']").forEach(function(r){r.checked=false;});
     selectType("Reading",document.getElementById("readingBtn"));
     if(hasGroupQ)toggleGroupBlock();
+    // Grid ni qayta qurish — file inputlar to'liq tozalansin
+    buildOptsGrid("optsGrid","","correct");
+    buildOptsGrid("g2Grid","g2","g2correct");
+    fillAllTplSelects();
   }catch(err){showStatus("Xatolik: "+err.message,"error");}
   btn.disabled=false;btn.textContent="🚀 Firebase ga yuborish";
 }
