@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Korean Test — Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Sora:wght@400;600;800&display=swap" rel="stylesheet"/>
-<!-- showTab HEAD da — onclick ishlashi uchun -->
 <script>
 var pvItems=[];
 function showTab(tab){
@@ -18,19 +17,10 @@ function showTab(tab){
   if(!a||!p)return;
   a.style.display=tab==="add"?"block":"none";
   p.style.display=tab==="preview"?"block":"none";
-  if(t) t.style.display=tab==="templates"?"block":"none";
-  ba.style.background=tab==="add"?"linear-gradient(135deg,#4f8ef7,#7c5cfc)":"transparent";
-  ba.style.border=tab==="add"?"none":"1.5px solid #2a3045";
-  ba.style.color=tab==="add"?"#fff":"#6b7280";
-  bp.style.background=tab==="preview"?"linear-gradient(135deg,#4f8ef7,#7c5cfc)":"transparent";
-  bp.style.border=tab==="preview"?"none":"1.5px solid #2a3045";
-  bp.style.color=tab==="preview"?"#fff":"#6b7280";
-  var bt=document.getElementById("tabTemplates");
-  if(bt){
-    bt.style.background=tab==="templates"?"linear-gradient(135deg,#4f8ef7,#7c5cfc)":"transparent";
-    bt.style.border=tab==="templates"?"none":"1.5px solid #2a3045";
-    bt.style.color=tab==="templates"?"#fff":"#6b7280";
-  }
+  if(t)t.style.display=tab==="templates"?"block":"none";
+  [ba,bp,bt].forEach(function(b){if(b){b.style.background="transparent";b.style.border="1.5px solid #2a3045";b.style.color="#6b7280";}});
+  var active=tab==="add"?ba:tab==="preview"?bp:bt;
+  if(active){active.style.background="linear-gradient(135deg,#4f8ef7,#7c5cfc)";active.style.border="none";active.style.color="#fff";}
   if(tab==="preview"&&typeof pvLoad==="function"&&pvItems.length===0)pvLoad();
   if(tab==="templates"&&typeof loadTemplates==="function")loadTemplates();
 }
@@ -63,9 +53,13 @@ header h1{font-size:17px;font-weight:800;background:linear-gradient(90deg,var(--
 .tog-btn.active-h{background:var(--red);border-color:transparent;color:#fff}
 textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;padding:10px 14px;resize:vertical;min-height:70px;outline:none;transition:border-color 0.2s}
 textarea:focus{border-color:var(--accent)}
+input[type=text],input[type=search]{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;padding:10px 14px;outline:none;transition:border-color 0.2s;width:100%}
+input[type=text]:focus,input[type=search]:focus{border-color:var(--accent)}
 select{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;padding:8px 12px;cursor:pointer;outline:none;transition:border-color 0.2s;flex-shrink:0}
 select:focus{border-color:var(--accent)}
 .field-row{display:flex;gap:10px;align-items:flex-start}
+.field{margin-bottom:12px}
+.field label{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;display:block;margin-bottom:5px}
 .upload-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 .upload-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;background:var(--surface2);border:1.5px dashed var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
 .upload-btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -104,6 +98,12 @@ select:focus{border-color:var(--accent)}
 .hint{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:6px}
 .pv-item{background:#161a23;border:1px solid #2a3045;border-radius:10px;padding:12px;cursor:pointer;transition:border-color 0.2s}
 .pv-item:hover,.pv-item.sel{border-color:#4f8ef7}
+.tpl-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface2);border-radius:10px;margin-bottom:8px}
+.btn{padding:9px 18px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif}
+.btn-blue{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-red{background:#c0392b;color:#fff}
+.btn-green{background:#27ae60;color:#fff}
+.btn:hover{opacity:0.85}
 </style>
 </head>
 <body>
@@ -113,7 +113,6 @@ select:focus{border-color:var(--accent)}
   <div style="display:flex;gap:8px;margin-left:auto">
     <button id="tabAdd" onclick="showTab('add')" style="padding:7px 16px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">➕ Yangi savol</button>
     <button id="tabPreview" onclick="showTab('preview')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">👁 Ko&#39;rinish &amp; Tahrir</button>
-    <button id="tabTemplates" onclick="showTab('templates')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">🎧 Shablonlar</button>
     <button id="tabTemplates" onclick="showTab('templates')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">🎧 Audio shablonlar</button>
   </div>
 </header>
@@ -188,17 +187,15 @@ select:focus{border-color:var(--accent)}
   <div class="card">
     <div class="card-header"><div class="step">4</div><h2>Savol maqsadi</h2><span class="badge-opt">ixtiyoriy</span></div>
     <div class="card-body">
-      <!-- Shablon tanlash -->
       <div style="margin-bottom:10px">
-        <label style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;display:block;margin-bottom:6px">🎧 AUDIO SHABLON TANLASH (ixtiyoriy)</label>
+        <label style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;display:block;margin-bottom:6px">🎧 AUDIO SHABLON (ixtiyoriy)</label>
         <div style="display:flex;gap:8px;align-items:center">
           <select id="purposeTpl" onchange="onPurposeTpl()" style="flex:1">
             <option value="">— Shablon tanlang —</option>
           </select>
-          <button type="button" onclick="previewTplAudio('purposeTpl')" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-size:12px;cursor:pointer">▶ Tinglash</button>
+          <button type="button" onclick="previewTplAudio('purposeTplPreview')" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-size:12px;cursor:pointer">▶ Tinglash</button>
         </div>
         <audio id="purposeTplPreview" style="display:none;width:100%;height:32px;margin-top:6px" controls></audio>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:'IBM Plex Mono',monospace">Tanlansa: savoldan oldin bu audio o'qiladi</div>
       </div>
       <div class="field-row">
         <textarea id="purposeText" placeholder="Masalan: 다음을 듣고 물음에 답하십시오."></textarea>
@@ -238,53 +235,29 @@ select:focus{border-color:var(--accent)}
   </div>
 </div>
 
-
-<!-- SHABLONLAR PAGE -->
+<!-- ══ AUDIO SHABLONLAR ══ -->
 <div id="pageTemplates" style="display:none;max-width:900px;margin:0 auto;padding:28px 20px">
-
-  <!-- Yangi shablon qo'shish -->
-  <div class="card" style="margin-bottom:20px">
-    <div class="card-header"><div class="step">+</div><h2>Yangi shablon qo'shish</h2></div>
-    <div class="card-body">
-      <div class="field-row" style="margin-bottom:12px">
-        <div style="flex:1">
-          <div class="field">
-            <label>Tur</label>
-            <select id="tmplType" style="width:100%">
-              <option value="purpose">📝 Savol maqsadi (purpose)</option>
-              <option value="option">🔤 Variant (option)</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Matn (koreys)</label>
-            <textarea id="tmplText" placeholder="다음을 듣고 물음에 답하십시오." style="min-height:60px"></textarea>
-          </div>
-        </div>
-      </div>
-      <div class="field">
-        <label>Audio fayl</label>
-        <label class="upload-btn">🎧 Audio yuklash<input type="file" id="tmplAudioFile" accept="audio/*" onchange="showName(this,'tmplAudioName')"></label>
-        <div id="tmplAudioName" class="fname"></div>
-      </div>
-      <div id="tmplStatus" class="status-msg" style="margin-top:10px"></div>
-      <button onclick="saveTmpl()" style="margin-top:12px;padding:10px 24px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:13px;font-weight:700;cursor:pointer">💾 Saqlash</button>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+    <div style="font-size:14px;font-weight:800;margin-bottom:16px">➕ Yangi audio shablon qo'shish</div>
+    <div class="field">
+      <label>NOM (ko'rinadigan matn)</label>
+      <input type="text" id="tplTitle" placeholder="Masalan: 다음을 듣고...">
     </div>
+    <div class="field">
+      <label>AUDIO FAYL</label>
+      <label class="upload-btn">🎧 Audio yuklash<input type="file" id="tplAudioFile" accept="audio/*" onchange="showTplName(this)"></label>
+      <div id="tplAudioName" class="fname"></div>
+    </div>
+    <div id="tplStatus" style="font-size:13px;margin-bottom:10px;min-height:18px;padding:8px 0"></div>
+    <button onclick="saveTpl()" class="btn btn-blue">💾 Saqlash</button>
   </div>
 
-  <!-- Mavjud shablonlar -->
-  <div class="card">
-    <div class="card-header"><div class="step">📋</div><h2>Mavjud shablonlar</h2></div>
-    <div class="card-body">
-      <div style="display:flex;gap:8px;margin-bottom:12px">
-        <button onclick="loadTemplates()" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;cursor:pointer">🔄 Yangilash</button>
-        <select id="tmplFilter" onchange="loadTemplates()" style="padding:7px 12px;border-radius:8px">
-          <option value="">Barchasi</option>
-          <option value="purpose">Savol maqsadi</option>
-          <option value="option">Variant</option>
-        </select>
-      </div>
-      <div id="tmplList"><div class="spinner">⏳ Yuklanmoqda...</div></div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-size:14px;font-weight:800">📋 Mavjud shablonlar</div>
+      <button onclick="loadTemplates()" style="padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">🔄 Yangilash</button>
     </div>
+    <div id="tplList"><div style="color:var(--muted);font-size:13px">Yuklanmoqda...</div></div>
   </div>
 </div>
 
@@ -293,7 +266,7 @@ select:focus{border-color:var(--accent)}
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
     <div style="font-size:14px;font-weight:800;margin-bottom:14px">🔍 Savol qidirish</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      <input id="pvSearch" placeholder="Matn qidirish..." style="flex:1;min-width:160px;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none">
+      <input id="pvSearch" type="search" placeholder="Matn qidirish..." style="flex:1;min-width:160px;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none">
       <select id="pvSection" style="padding:9px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:12px">
         <option value="">Barcha bolim</option><option>EPS TOPIK</option><option>TOPIK 1</option><option>TOPIK 2</option>
       </select>
@@ -303,11 +276,10 @@ select:focus{border-color:var(--accent)}
       <select id="pvDiff" style="padding:9px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:12px">
         <option value="">Barcha qiyinlik</option><option>Very Easy</option><option>Easy</option><option>Medium</option><option>Above Medium</option><option>Hard</option>
       </select>
-      <button onclick="pvLoad()" style="padding:9px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:13px;font-weight:700;cursor:pointer">🔍 Qidirish</button>
+      <button onclick="pvLoad()" class="btn btn-blue" style="padding:9px 18px">🔍 Qidirish</button>
     </div>
     <div id="pvStatus" style="font-size:12px;color:var(--muted)"></div>
   </div>
-
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
     <div>
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px;font-family:'IBM Plex Mono',monospace">Savollar</div>
@@ -323,20 +295,20 @@ select:focus{border-color:var(--accent)}
       <div id="pvEditPanel" style="display:none;margin-top:16px;background:var(--surface2);border:1.5px solid var(--accent);border-radius:14px;padding:20px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
           <span style="font-size:14px;font-weight:800">✏️ Tahrirlash</span>
-          <button id="pvDelBtn" style="padding:5px 12px;border-radius:6px;border:none;background:#c0392b;color:#fff;font-size:12px;cursor:pointer">🗑 Ochirish</button>
+          <button id="pvDelBtn" class="btn btn-red" style="font-size:12px;padding:5px 12px">🗑 O'chirish</button>
         </div>
         <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">MAQSAD</label>
         <textarea id="pvPurpose" style="min-height:44px;margin-bottom:10px"></textarea>
         <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">SAVOL MATNI</label>
         <textarea id="pvQText" style="min-height:44px;margin-bottom:10px"></textarea>
-        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">TOGRI JAVOB</label>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">TO'G'RI JAVOB</label>
         <select id="pvCorrect" style="width:100%;margin-bottom:10px">
           <option value="0">① 1-variant</option><option value="1">② 2-variant</option>
           <option value="2">③ 3-variant</option><option value="3">④ 4-variant</option>
         </select>
         <div id="pvOptsEdit" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"></div>
         <div id="pvSaveStatus" style="font-size:12px;margin-bottom:8px;min-height:18px"></div>
-        <button id="pvSaveBtn" style="width:100%;padding:11px;border-radius:8px;border:none;background:#27ae60;color:#fff;font-size:13px;font-weight:700;cursor:pointer">💾 Saqlash</button>
+        <button id="pvSaveBtn" class="btn btn-green" style="width:100%;padding:11px">💾 Saqlash</button>
       </div>
     </div>
   </div>
@@ -359,8 +331,9 @@ var storage=firebase.storage();
 var selectedTestType="Reading";
 var hasGroupQ=false;
 var NUMS=["①","②","③","④"];
+var allTemplates=[];
 
-// Variantlar gridlarini render qilamiz
+// ══ GRID BUILDER ══
 function buildOptsGrid(containerId,namePrefix,radioName){
   var el=document.getElementById(containerId);
   el.innerHTML=NUMS.map(function(num,i){
@@ -369,28 +342,43 @@ function buildOptsGrid(containerId,namePrefix,radioName){
       "<label class='correct-lbl'><input type='radio' name='"+radioName+"' value='"+i+"' onchange=\"markCorrect('"+namePrefix+"',"+i+")\"> To&#39;g&#39;ri ✓</label></div>"+
       "<div class='vfield'><label>Matn</label><div class='field-row'>"+
       "<textarea id='"+namePrefix+"opt"+i+"Text' placeholder='Variant "+(i+1)+"...' style='min-height:50px'></textarea>"+
-      "<button type='button' onclick=\"wrapUnderline('"+namePrefix+"opt"+i+"Text')\" style='margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:IBM Plex Mono,monospace'><u>A</u></button>"+
-      "<select id='"+namePrefix+"opt"+i+"FS'><option value='14'>Kichik</option><option value='18' selected>Orta</option><option value='22'>Katta</option></select></div></div>"+
-      "<div class='vfield'><label>Audio</label><label class='upload-btn'>🎧<input type='file' id='"+namePrefix+"opt"+i+"Audio' accept='audio/*' onchange=\"showName(this,'"+namePrefix+"opt"+i+"AudioName')\"></label><div id='"+namePrefix+"opt"+i+"AudioName' class='fname'></div></div>"+
+      "<button type='button' onclick=\"wrapUnderline('"+namePrefix+"opt"+i+"Text')\" style='margin-top:5px;padding:4px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer'><u>A</u></button>"+
+      "<select id='"+namePrefix+"opt"+i+"FS'><option value='14'>Kichik</option><option value='18' selected>O'rta</option><option value='22'>Katta</option></select></div></div>"+
+      "<div class='vfield'><label>Audio shablon</label>"+
+      "<select id='"+namePrefix+"opt"+i+"Tpl' style='width:100%;margin-bottom:6px'><option value=''>— Shablon —</option></select></div>"+
+      "<div class='vfield'><label>Audio fayl</label><label class='upload-btn'>🎧<input type='file' id='"+namePrefix+"opt"+i+"Audio' accept='audio/*' onchange=\"showName(this,'"+namePrefix+"opt"+i+"AudioName')\"></label><div id='"+namePrefix+"opt"+i+"AudioName' class='fname'></div></div>"+
       "<div class='vfield'><label>Rasm</label><label class='upload-btn'>🖼<input type='file' id='"+namePrefix+"opt"+i+"Img' accept='image/*' onchange=\"showPreview(this,'"+namePrefix+"opt"+i+"ImgPrev')\"></label><img id='"+namePrefix+"opt"+i+"ImgPrev' class='ipreview'/></div>"+
       "</div>";
   }).join("");
 }
 
+window.addEventListener("DOMContentLoaded",function(){
+  buildOptsGrid("optsGrid","","correct");
+  buildOptsGrid("g2Grid","g2","g2correct");
+  // Shablonlarni yuklaymiz
+  db.collection("audioTemplates").orderBy("createdAt","desc").get().then(function(snap){
+    allTemplates=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
+    fillAllTplSelects();
+  });
+});
 
 // ══ SHABLONLAR ══
-var allTemplates=[];
-
 function showTplName(inp){
-  if(inp.files[0])document.getElementById("tplAudioName").textContent="✅ "+inp.files[0].name;
+  if(inp.files[0]){
+    var el=document.getElementById("tplAudioName");
+    if(el)el.textContent="✅ "+inp.files[0].name;
+  }
 }
 
 async function saveTpl(){
-  var title=document.getElementById("tplTitle").value.trim();
-  var file=document.getElementById("tplAudioFile").files[0];
+  var titleEl=document.getElementById("tplTitle");
+  var fileEl=document.getElementById("tplAudioFile");
   var st=document.getElementById("tplStatus");
-  if(!title){st.textContent="❌ Nom kiriting";st.style.color="var(--red)";return}
-  if(!file){st.textContent="❌ Audio faylni tanlang";st.style.color="var(--red)";return}
+  if(!titleEl||!fileEl||!st){alert("Forma topilmadi");return;}
+  var title=titleEl.value.trim();
+  var file=fileEl.files[0];
+  if(!title){st.textContent="❌ Nom kiriting";st.style.color="var(--red)";return;}
+  if(!file){st.textContent="❌ Audio faylni tanlang";st.style.color="var(--red)";return;}
   st.textContent="⏳ Yuklanmoqda...";st.style.color="var(--yellow)";
   try{
     var ext=file.name.split(".").pop()||"mp3";
@@ -398,15 +386,17 @@ async function saveTpl(){
     var snap=await storage.ref(path).put(file);
     var url=await snap.ref.getDownloadURL();
     await db.collection("audioTemplates").add({
-      title:title, audioUrl:url,
+      title:title,audioUrl:url,
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
     st.textContent="✅ Saqlandi!";st.style.color="var(--green)";
-    document.getElementById("tplTitle").value="";
-    document.getElementById("tplAudioFile").value="";
-    document.getElementById("tplAudioName").textContent="";
+    titleEl.value="";fileEl.value="";
+    var n=document.getElementById("tplAudioName");
+    if(n)n.textContent="";
     loadTemplates();
-  }catch(e){st.textContent="❌ Xato: "+e.message;st.style.color="var(--red)";}
+  }catch(e){
+    st.textContent="❌ Xato: "+e.message;st.style.color="var(--red)";
+  }
 }
 
 function loadTemplates(){
@@ -420,21 +410,20 @@ function loadTemplates(){
       el.innerHTML="<div style='color:var(--muted);font-size:13px'>Hali shablon qo'shilmagan</div>";
       return;
     }
-    var html=allTemplates.map(function(tpl){
-      return "<div style='display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface2);border-radius:10px;margin-bottom:8px'>"+
+    el.innerHTML=allTemplates.map(function(tpl){
+      return "<div class='tpl-item'>"+
         "<div style='flex:1'>"+
-        "<div style='font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px'>"+tpl.title+"</div>"+
+        "<div style='font-size:13px;font-weight:700;margin-bottom:6px'>"+tpl.title+"</div>"+
         "<audio controls style='height:30px;width:100%'><source src='"+tpl.audioUrl+"'></audio>"+
         "</div>"+
         "<button data-del='"+tpl._id+"' style='padding:5px 10px;border-radius:6px;border:1.5px solid var(--red);background:transparent;color:var(--red);font-size:11px;cursor:pointer;flex-shrink:0'>🗑</button>"+
         "</div>";
     }).join("");
-    el.innerHTML=html;
     el.querySelectorAll("[data-del]").forEach(function(btn){
       btn.addEventListener("click",function(){
-        if(!confirm("Shu shablonni ochirasizmi?"))return;
+        if(!confirm("Bu shablonni ochirasizmi?"))return;
         db.collection("audioTemplates").doc(this.getAttribute("data-del")).delete()
-          .then(function(){loadTemplates()});
+          .then(function(){loadTemplates();});
       });
     });
   });
@@ -445,8 +434,7 @@ function fillAllTplSelects(){
     allTemplates.map(function(t){
       return "<option value='"+t.audioUrl+"'>"+t.title+"</option>";
     }).join("");
-  ["purposeTpl","opt0Tpl","opt1Tpl","opt2Tpl","opt3Tpl",
-   "g2opt0Tpl","g2opt1Tpl","g2opt2Tpl","g2opt3Tpl"].forEach(function(sid){
+  ["purposeTpl","opt0Tpl","opt1Tpl","opt2Tpl","opt3Tpl","g2opt0Tpl","g2opt1Tpl","g2opt2Tpl","g2opt3Tpl"].forEach(function(sid){
     var sel=document.getElementById(sid);
     if(sel){var cur=sel.value;sel.innerHTML=opts;if(cur)sel.value=cur;}
   });
@@ -461,48 +449,23 @@ function onPurposeTpl(){
   } else if(preview){preview.style.display="none";}
 }
 
-function onOptTpl(selId){
-  var sel=document.getElementById(selId);
-  if(!sel||!sel.value)return;
-  var preview=sel.parentElement.querySelector("audio");
-  if(!preview){
-    preview=document.createElement("audio");
-    preview.controls=true;preview.style.cssText="width:100%;height:28px;margin-top:4px;display:block";
-    sel.parentElement.appendChild(preview);
-  }
-  preview.innerHTML="<source src='"+sel.value+"'>";
-  preview.load();preview.play();
+function previewTplAudio(previewId){
+  var el=document.getElementById(previewId);
+  if(el&&el.style.display!=="none"){el.play();}
 }
 
-
-window.addEventListener("DOMContentLoaded",function(){
-  db.collection("audioTemplates").get().then(function(snap){
-    allTemplates=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
-    fillTplSelects();
-  });
-});
-
-window.addEventListener("DOMContentLoaded",function(){
-  buildOptsGrid("optsGrid","","correct");
-  buildOptsGrid("g2Grid","g2","g2correct");
-  // Shablonlarni yuklaymiz
-  db.collection("audioTemplates").orderBy("createdAt","desc").get().then(function(snap){
-    allTemplates=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
-    fillAllTplSelects();
-  });
-});
-
+// ══ UTILS ══
 function markCorrect(prefix,idx){
   for(var i=0;i<4;i++){
     var el=document.getElementById(prefix+"vcard"+i);
-    if(el) el.className="vcard"+(i===idx?" correct-selected":"");
+    if(el)el.className="vcard"+(i===idx?" correct-selected":"");
   }
 }
 function wrapUnderline(id){
   var ta=document.getElementById(id);
   var s=ta.selectionStart,e=ta.selectionEnd;
   var sel=ta.value.substring(s,e);
-  if(!sel.length){alert("Avval matnni tanlang!");return}
+  if(!sel.length){alert("Avval matnni tanlang!");return;}
   ta.value=ta.value.substring(0,s)+"__"+sel+"__"+ta.value.substring(e);
   ta.selectionStart=s;ta.selectionEnd=e+4;
   ta.dispatchEvent(new Event("input"));
@@ -533,51 +496,50 @@ function updateQ1Media(){
   if(af)html+="<div style='padding:8px;background:rgba(39,174,96,0.1);border-radius:8px;margin-bottom:6px'>🎧 "+af.name+"</div>";
   if(qt)html+="<div style='padding:8px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-size:13px'>"+qt+"</div>";
   if(img.src&&img.style.display!=="none")html+="<img src='"+img.src+"' style='max-width:100%;max-height:100px;border-radius:8px'>";
-  if(!html)html="<span style='color:var(--muted);font-size:12px'>1-savolga media qoshsangiz shu yerda korinadi</span>";
+  if(!html)html="<span style='color:var(--muted);font-size:12px'>Media qo'shilmagan</span>";
   el.innerHTML=html;
 }
 function toggleGroupBlock(){
   hasGroupQ=!hasGroupQ;
   document.getElementById("groupBlock").classList.toggle("show",hasGroupQ);
   document.getElementById("groupAddIcon").textContent=hasGroupQ?"✕":"＋";
-  document.getElementById("groupAddText").textContent=hasGroupQ?"Guruh savolni olib tashlash":"Guruh savol qoshish (bitta media uchun 2 ta savol)";
+  document.getElementById("groupAddText").textContent=hasGroupQ?"Guruh savolni olib tashlash":"Guruh savol qo'shish";
   document.getElementById("groupAddBtn").style.borderColor=hasGroupQ?"var(--red)":"";
   document.getElementById("groupAddBtn").style.color=hasGroupQ?"var(--red)":"";
   if(hasGroupQ)updateQ1Media();
 }
-function showName(input,id){if(input.files[0])document.getElementById(id).textContent="✅ "+input.files[0].name}
+function showName(input,id){if(input.files[0])document.getElementById(id).textContent="✅ "+input.files[0].name;}
 function showPreview(input,id){
   if(input.files[0]){
     var r=new FileReader();
-    r.onload=function(e){var img=document.getElementById(id);img.src=e.target.result;img.style.display="block"};
+    r.onload=function(e){var img=document.getElementById(id);img.src=e.target.result;img.style.display="block";};
     r.readAsDataURL(input.files[0]);
   }
 }
 function showStatus(msg,type){
   var el=document.getElementById("statusMsg");
   el.textContent=msg;el.className="status-msg "+type;
-  setTimeout(function(){el.style.display="none"},6000);
+  setTimeout(function(){el.style.display="none";},6000);
 }
-function randStr(){return Math.random().toString(36).substring(2,8)}
 async function uploadFile(file,path){
   if(!file)return null;
-  // Fayl kengaytmasini olamiz
   var ext=file.name.split(".").pop()||"bin";
-  // To'liq unique path: path_timestamp_random.ext
-  var uniquePath=path+"_"+Date.now()+"_"+randStr()+"."+ext;
+  var uniquePath=path+"_"+Date.now()+"_"+Math.random().toString(36).substring(2,8)+"."+ext;
   var ref=storage.ref(uniquePath);
   var snap=await ref.put(file);
   return await snap.ref.getDownloadURL();
 }
+
+// ══ SUBMIT ══
 async function submitQuestion(){
   var btn=document.getElementById("submitBtn");
   var section=document.querySelector("#sectionGroup .tog-btn.active-section");
   var diff=document.querySelector("#diffGroup .tog-btn[class*='active-ve'],#diffGroup .tog-btn[class*='active-e'],#diffGroup .tog-btn[class*='active-m'],#diffGroup .tog-btn[class*='active-am'],#diffGroup .tog-btn[class*='active-h']");
   var cor=document.querySelector("input[name='correct']:checked");
-  if(!section){showStatus("Bolim tanlang!","error");return}
-  if(!diff){showStatus("Qiyinlik tanlang!","error");return}
-  if(!cor){showStatus("1-savol togri javobni belgilang!","error");return}
-  if(hasGroupQ&&!document.querySelector("input[name='g2correct']:checked")){showStatus("2-savol togri javobni belgilang!","error");return}
+  if(!section){showStatus("Bo'lim tanlang!","error");return;}
+  if(!diff){showStatus("Qiyinlik tanlang!","error");return;}
+  if(!cor){showStatus("To'g'ri javobni belgilang!","error");return;}
+  if(hasGroupQ&&!document.querySelector("input[name='g2correct']:checked")){showStatus("2-savol to'g'ri javobni belgilang!","error");return;}
   btn.disabled=true;btn.textContent="Yuklanmoqda...";
   try{
     var ts=Date.now();
@@ -590,31 +552,29 @@ async function submitQuestion(){
     for(var i=0;i<4;i++){
       var af=document.getElementById("opt"+i+"Audio").files[0];
       var imf=document.getElementById("opt"+i+"Img").files[0];
-      // Shablon audio URL
       var tplSel=document.getElementById("opt"+i+"Tpl");
       var tplUrl=tplSel&&tplSel.value?tplSel.value:null;
-      var uploadedAudioUrl=await uploadFile(af,"audio/opt"+i);
+      var uploadedAu=await uploadFile(af,"audio/opt"+i);
       opts1.push({
         text:document.getElementById("opt"+i+"Text").value.trim()||null,
         fontSize:parseInt(document.getElementById("opt"+i+"FS").value),
-        audioUrl:uploadedAudioUrl||tplUrl,
+        audioUrl:uploadedAu||tplUrl,
         imageUrl:await uploadFile(imf,"images/opt"+i)
       });
     }
+    var purposeTplSel=document.getElementById("purposeTpl");
     var q1={
       section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
-      topTitle:document.getElementById("topTitleText").value.trim()||null,
-      topTitleFontSize:parseInt(document.getElementById("topTitleFS").value),
       purpose:document.getElementById("purposeText").value.trim()||null,
       purposeFontSize:parseInt(document.getElementById("purposeFS").value),
-      purposeAudioUrl:selectedPurposeTmpl?selectedPurposeTmpl.audioUrl:null,
+      purposeAudioUrl:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
       questionText:document.getElementById("questionText").value.trim()||null,
       questionFontSize:parseInt(document.getElementById("questionFS").value),
       questionAudioUrl:qaUrl,questionImageUrl:qiUrl,
       options:opts1,correctIndex:parseInt(cor.value),
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     };
-    if(gId){q1.groupId=gId;q1.groupOrder=1}
+    if(gId){q1.groupId=gId;q1.groupOrder=1;}
     await db.collection("questions").add(q1);
     if(hasGroupQ){
       var g2c=document.querySelector("input[name='g2correct']:checked");
@@ -631,8 +591,6 @@ async function submitQuestion(){
       }
       await db.collection("questions").add({
         section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
-        topTitle:document.getElementById("topTitleText").value.trim()||null,
-        topTitleFontSize:parseInt(document.getElementById("topTitleFS").value),
         purpose:document.getElementById("g2Purpose").value.trim()||null,
         purposeFontSize:parseInt(document.getElementById("g2PurposeFS").value),
         questionText:document.getElementById("questionText").value.trim()||null,
@@ -647,21 +605,21 @@ async function submitQuestion(){
       showStatus("Savol saqlandi! ("+selectedTestType+")","success");
     }
     // Tozalash
-    document.querySelectorAll("#sectionGroup .tog-btn").forEach(function(b){b.classList.remove("active-section")});
-    document.querySelectorAll("#diffGroup .tog-btn").forEach(function(b){b.classList.remove("active-ve","active-e","active-m","active-am","active-h")});
-    ["topTitleText","purposeText","questionText"].forEach(function(id){document.getElementById(id).value=""});
+    document.querySelectorAll("#sectionGroup .tog-btn").forEach(function(b){b.classList.remove("active-section");});
+    document.querySelectorAll("#diffGroup .tog-btn").forEach(function(b){b.classList.remove("active-ve","active-e","active-m","active-am","active-h");});
+    ["purposeText","questionText"].forEach(function(id){document.getElementById(id).value="";});
     document.getElementById("qAudioName").textContent="";
     document.getElementById("qImgPreview").style.display="none";
     for(var k=0;k<4;k++){
       document.getElementById("opt"+k+"Text").value="";
       document.getElementById("opt"+k+"AudioName").textContent="";
       document.getElementById("opt"+k+"ImgPrev").style.display="none";
-      document.getElementById("vcard"+k+"").className="vcard";
+      document.getElementById("vcard"+k).className="vcard";
     }
-    document.querySelectorAll("input[name='correct']").forEach(function(r){r.checked=false});
+    document.querySelectorAll("input[name='correct']").forEach(function(r){r.checked=false;});
     selectType("Reading",document.getElementById("readingBtn"));
     if(hasGroupQ)toggleGroupBlock();
-  }catch(err){showStatus("Xatolik: "+err.message,"error")}
+  }catch(err){showStatus("Xatolik: "+err.message,"error");}
   btn.disabled=false;btn.textContent="🚀 Firebase ga yuborish";
 }
 
@@ -686,11 +644,11 @@ function pvLoad(){
       if(sec&&item.section!==sec)return false;
       if(type&&item.testType!==type)return false;
       if(diff&&item.difficulty!==diff)return false;
-      if(q){var txt=(item.purpose||"")+(item.questionText||"");if(txt.toLowerCase().indexOf(q)===-1)return false}
+      if(q){var txt=(item.purpose||"")+(item.questionText||"");if(txt.toLowerCase().indexOf(q)===-1)return false;}
       return true;
     });
     document.getElementById("pvStatus").textContent=pvItems.length+" ta savol topildi";
-    if(!pvItems.length){el.innerHTML="<div style='color:var(--muted);font-size:13px;text-align:center;padding:30px'>Topilmadi</div>";return}
+    if(!pvItems.length){el.innerHTML="<div style='color:var(--muted);font-size:13px;text-align:center;padding:30px'>Topilmadi</div>";return;}
     el.innerHTML=pvItems.map(function(item){
       var sc={"EPS TOPIK":"#4f8ef7","TOPIK 1":"#2ecc71","TOPIK 2":"#f1c40f"}[item.section]||"#6b7280";
       var txt=(item.purpose||item.questionText||"—").substring(0,70);
@@ -703,12 +661,12 @@ function pvLoad(){
     }).join("");
     el.querySelectorAll(".pv-item").forEach(function(card){
       card.addEventListener("click",function(){
-        el.querySelectorAll(".pv-item").forEach(function(c){c.classList.remove("sel")});
+        el.querySelectorAll(".pv-item").forEach(function(c){c.classList.remove("sel");});
         this.classList.add("sel");
         pvSelectItem(this.getAttribute("data-id"));
       });
     });
-  }).catch(function(e){el.innerHTML="<div style='color:var(--red);padding:20px'>Xato: "+e.message+"</div>"});
+  }).catch(function(e){el.innerHTML="<div style='color:var(--red);padding:20px'>Xato: "+e.message+"</div>";});
 }
 function pvSelectItem(id){
   var item=pvItems.find(function(q){return q._id===id});
@@ -719,7 +677,6 @@ function pvSelectItem(id){
 function pvRenderPhone(item){
   var opts=item.options||[];
   var html="<div style='background:#E8ECF0;border-radius:20px;padding:14px'>";
-  if(item.topTitle)html+="<div style='text-align:center;padding:10px 0 6px;margin-bottom:8px;font-size:"+(item.topTitleFontSize||26)+"px;font-weight:800;color:#4A5568;letter-spacing:1px'>"+pvFmt(item.topTitle)+"</div>";
   if(item.purpose)html+="<div style='background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;font-size:13px;color:#4A5568;text-align:center;box-shadow:3px 3px 8px #C8CDD4,-3px -3px 8px #fff;line-height:1.6'>"+pvFmt(item.purpose)+"</div>";
   if(item.questionText)html+="<div style='background:#E8ECF0;border-radius:12px;padding:12px;margin-bottom:10px;font-size:13px;color:#4A5568;box-shadow:inset 2px 2px 6px #C8CDD4,inset -2px -2px 6px #fff;line-height:1.6'>"+pvFmt(item.questionText)+"</div>";
   if(item.questionAudioUrl)html+="<div style='background:#E8ECF0;border-radius:14px;padding:10px;margin-bottom:10px;display:flex;align-items:center;gap:10px;box-shadow:4px 4px 10px #C8CDD4,-4px -4px 10px #fff'><div style='width:36px;height:36px;border-radius:50%;background:#5B6EF0;display:flex;align-items:center;justify-content:center;color:#fff'>▶</div><div style='font-size:11px;color:#5B6EF0;font-weight:600'>Audio tayyor</div></div>";
@@ -747,8 +704,8 @@ function pvRenderEdit(item){
       "<textarea id='pvOpt"+i+"' style='min-height:36px'>"+(opt.text||"")+"</textarea></div>";
   }
   document.getElementById("pvOptsEdit").innerHTML=oh;
-  document.getElementById("pvSaveBtn").onclick=function(){pvSave(item._id)};
-  document.getElementById("pvDelBtn").onclick=function(){pvDelete(item._id)};
+  document.getElementById("pvSaveBtn").onclick=function(){pvSave(item._id);};
+  document.getElementById("pvDelBtn").onclick=function(){pvDelete(item._id);};
   document.getElementById("pvEditPanel").style.display="block";
   document.getElementById("pvSaveStatus").textContent="";
   document.getElementById("pvEditPanel").scrollIntoView({behavior:"smooth",block:"nearest"});
@@ -771,8 +728,7 @@ async function pvSave(id){
   db.collection("questions").doc(id).update(update)
     .then(function(){
       document.getElementById("pvSaveStatus").innerHTML="<span style='color:var(--green)'>Saqlandi!</span>";
-      Object.assign(item,update);
-      pvRenderPhone(item);
+      Object.assign(item,update);pvRenderPhone(item);
     })
     .catch(function(e){
       document.getElementById("pvSaveStatus").innerHTML="<span style='color:var(--red)'>Xato: "+e.message+"</span>";
@@ -782,36 +738,10 @@ function pvDelete(id){
   if(!confirm("Rostdan ochirasizmi?"))return;
   db.collection("questions").doc(id).delete().then(function(){
     document.getElementById("pvEditPanel").style.display="none";
-    document.getElementById("pvPhone").innerHTML="<div style='color:#8E97A5;font-size:12px;text-align:center;padding:40px 0'>Savol ochirildi</div>";
+    document.getElementById("pvPhone").innerHTML="<div style='color:#8E97A5;font-size:12px;text-align:center;padding:40px 0'>Savol o'chirildi</div>";
     pvLoad();
   });
 }
 </script>
-
-<!-- AUDIO SHABLONLAR -->
-<div id="pageTemplates" style="display:none;max-width:900px;margin:0 auto;padding:28px 20px">
-
-  <!-- Yangi shablon qo'shish -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
-    <div style="font-size:14px;font-weight:800;margin-bottom:16px">➕ Yangi audio shablon qo'shish</div>
-    <div style="margin-bottom:12px">
-      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;font-family:'IBM Plex Mono',monospace">NOM (ko'rinadigan matn)</label>
-      <input id="tplTitle" placeholder="Masalan: 다음을 듣고..." style="width:100%;padding:10px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none">
-    </div>
-    <div style="margin-bottom:12px">
-      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;font-family:'IBM Plex Mono',monospace">AUDIO FAYL</label>
-      <label class="upload-btn">🎧 Audio yuklash<input type="file" id="tplAudioFile" accept="audio/*" onchange="showTplName(this)"></label>
-      <div id="tplAudioName" class="fname"></div>
-    </div>
-    <div id="tplStatus" style="font-size:13px;margin-bottom:10px;min-height:18px"></div>
-    <button onclick="saveTpl()" style="padding:10px 24px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:13px;font-weight:700;cursor:pointer">💾 Saqlash</button>
-  </div>
-
-  <!-- Mavjud shablonlar -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px">
-    <div style="font-size:14px;font-weight:800;margin-bottom:16px">📋 Mavjud shablonlar</div>
-    <div id="tplList"><div style="color:var(--muted);font-size:13px">Yuklanmoqda...</div></div>
-  </div>
-</div>
 </body>
 </html>
