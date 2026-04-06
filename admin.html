@@ -11,18 +11,28 @@ var pvItems=[];
 function showTab(tab){
   var a=document.getElementById("pageAdd");
   var p=document.getElementById("pagePreview");
+  var t=document.getElementById("pageTemplates");
   var ba=document.getElementById("tabAdd");
   var bp=document.getElementById("tabPreview");
+  var bt=document.getElementById("tabTemplates");
   if(!a||!p)return;
   a.style.display=tab==="add"?"block":"none";
   p.style.display=tab==="preview"?"block":"none";
+  if(t) t.style.display=tab==="templates"?"block":"none";
   ba.style.background=tab==="add"?"linear-gradient(135deg,#4f8ef7,#7c5cfc)":"transparent";
   ba.style.border=tab==="add"?"none":"1.5px solid #2a3045";
   ba.style.color=tab==="add"?"#fff":"#6b7280";
   bp.style.background=tab==="preview"?"linear-gradient(135deg,#4f8ef7,#7c5cfc)":"transparent";
   bp.style.border=tab==="preview"?"none":"1.5px solid #2a3045";
   bp.style.color=tab==="preview"?"#fff":"#6b7280";
+  var bt=document.getElementById("tabTemplates");
+  if(bt){
+    bt.style.background=tab==="templates"?"linear-gradient(135deg,#4f8ef7,#7c5cfc)":"transparent";
+    bt.style.border=tab==="templates"?"none":"1.5px solid #2a3045";
+    bt.style.color=tab==="templates"?"#fff":"#6b7280";
+  }
   if(tab==="preview"&&typeof pvLoad==="function"&&pvItems.length===0)pvLoad();
+  if(tab==="templates"&&typeof loadTemplates==="function")loadTemplates();
 }
 </script>
 <style>
@@ -103,6 +113,8 @@ select:focus{border-color:var(--accent)}
   <div style="display:flex;gap:8px;margin-left:auto">
     <button id="tabAdd" onclick="showTab('add')" style="padding:7px 16px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">➕ Yangi savol</button>
     <button id="tabPreview" onclick="showTab('preview')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">👁 Ko&#39;rinish &amp; Tahrir</button>
+    <button id="tabTemplates" onclick="showTab('templates')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">🎧 Shablonlar</button>
+    <button id="tabTemplates" onclick="showTab('templates')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">🎧 Audio shablonlar</button>
   </div>
 </header>
 
@@ -174,25 +186,20 @@ select:focus{border-color:var(--accent)}
   </div>
 
   <div class="card">
-    <div class="card-header"><div class="step">4</div><h2>Yuqori sarlavha</h2><span class="badge-opt">ixtiyoriy</span></div>
+    <div class="card-header"><div class="step">4</div><h2>Savol maqsadi</h2><span class="badge-opt">ixtiyoriy</span></div>
     <div class="card-body">
-      <div class="field-row">
-        <textarea id="topTitleText" placeholder="Masalan: &lt;책&gt; yoki 다음 글을 읽고..." style="min-height:50px"></textarea>
-        <button type="button" onclick="wrapUnderline('topTitleText')" style="margin-top:6px;padding:5px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:IBM Plex Mono,monospace"><u>A</u> Osti</button>
-        <select id="topTitleFS">
-          <option value="20">Kichik (20)</option>
-          <option value="26" selected>O'rta (26)</option>
-          <option value="32">Katta (32)</option>
-          <option value="38">Juda katta (38)</option>
-        </select>
+      <!-- Shablon tanlash -->
+      <div style="margin-bottom:10px">
+        <label style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;display:block;margin-bottom:6px">🎧 AUDIO SHABLON TANLASH (ixtiyoriy)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="purposeTpl" onchange="onPurposeTpl()" style="flex:1">
+            <option value="">— Shablon tanlang —</option>
+          </select>
+          <button type="button" onclick="previewTplAudio('purposeTpl')" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-size:12px;cursor:pointer">▶ Tinglash</button>
+        </div>
+        <audio id="purposeTplPreview" style="display:none;width:100%;height:32px;margin-top:6px" controls></audio>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:'IBM Plex Mono',monospace">Tanlansa: savoldan oldin bu audio o'qiladi</div>
       </div>
-      <p class="hint">Savol ekranining yuqori o'rtasida katta shrift bilan chiqadi</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-header"><div class="step">5</div><h2>Savol maqsadi</h2><span class="badge-opt">ixtiyoriy</span></div>
-    <div class="card-body">
       <div class="field-row">
         <textarea id="purposeText" placeholder="Masalan: 다음을 듣고 물음에 답하십시오."></textarea>
         <button type="button" onclick="wrapUnderline('purposeText')" style="margin-top:6px;padding:5px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:IBM Plex Mono,monospace"><u>A</u> Osti</button>
@@ -202,7 +209,7 @@ select:focus{border-color:var(--accent)}
   </div>
 
   <div class="card">
-    <div class="card-header"><div class="step">6</div><h2>Savol</h2><span class="badge-opt">ixtiyoriy</span></div>
+    <div class="card-header"><div class="step">5</div><h2>Savol</h2><span class="badge-opt">ixtiyoriy</span></div>
     <div class="card-body">
       <div class="field-row">
         <textarea id="questionText" placeholder="Savol matnini yozing..." oninput="updateQ1Media()"></textarea>
@@ -219,7 +226,7 @@ select:focus{border-color:var(--accent)}
   </div>
 
   <div class="card">
-    <div class="card-header"><div class="step">7</div><h2>Variantlar</h2><span class="badge-req">majburiy</span></div>
+    <div class="card-header"><div class="step">6</div><h2>Variantlar</h2><span class="badge-req">majburiy</span></div>
     <div class="card-body">
       <div class="variants-grid" id="optsGrid"></div>
     </div>
@@ -228,6 +235,56 @@ select:focus{border-color:var(--accent)}
   <div class="submit-area">
     <button id="submitBtn" onclick="submitQuestion()">🚀 Firebase ga yuborish</button>
     <div id="statusMsg" class="status-msg"></div>
+  </div>
+</div>
+
+
+<!-- SHABLONLAR PAGE -->
+<div id="pageTemplates" style="display:none;max-width:900px;margin:0 auto;padding:28px 20px">
+
+  <!-- Yangi shablon qo'shish -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-header"><div class="step">+</div><h2>Yangi shablon qo'shish</h2></div>
+    <div class="card-body">
+      <div class="field-row" style="margin-bottom:12px">
+        <div style="flex:1">
+          <div class="field">
+            <label>Tur</label>
+            <select id="tmplType" style="width:100%">
+              <option value="purpose">📝 Savol maqsadi (purpose)</option>
+              <option value="option">🔤 Variant (option)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Matn (koreys)</label>
+            <textarea id="tmplText" placeholder="다음을 듣고 물음에 답하십시오." style="min-height:60px"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Audio fayl</label>
+        <label class="upload-btn">🎧 Audio yuklash<input type="file" id="tmplAudioFile" accept="audio/*" onchange="showName(this,'tmplAudioName')"></label>
+        <div id="tmplAudioName" class="fname"></div>
+      </div>
+      <div id="tmplStatus" class="status-msg" style="margin-top:10px"></div>
+      <button onclick="saveTmpl()" style="margin-top:12px;padding:10px 24px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:13px;font-weight:700;cursor:pointer">💾 Saqlash</button>
+    </div>
+  </div>
+
+  <!-- Mavjud shablonlar -->
+  <div class="card">
+    <div class="card-header"><div class="step">📋</div><h2>Mavjud shablonlar</h2></div>
+    <div class="card-body">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button onclick="loadTemplates()" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;cursor:pointer">🔄 Yangilash</button>
+        <select id="tmplFilter" onchange="loadTemplates()" style="padding:7px 12px;border-radius:8px">
+          <option value="">Barchasi</option>
+          <option value="purpose">Savol maqsadi</option>
+          <option value="option">Variant</option>
+        </select>
+      </div>
+      <div id="tmplList"><div class="spinner">⏳ Yuklanmoqda...</div></div>
+    </div>
   </div>
 </div>
 
@@ -320,9 +377,119 @@ function buildOptsGrid(containerId,namePrefix,radioName){
   }).join("");
 }
 
+
+// ══ SHABLONLAR ══
+var allTemplates=[];
+
+function showTplName(inp){
+  if(inp.files[0])document.getElementById("tplAudioName").textContent="✅ "+inp.files[0].name;
+}
+
+async function saveTpl(){
+  var title=document.getElementById("tplTitle").value.trim();
+  var file=document.getElementById("tplAudioFile").files[0];
+  var st=document.getElementById("tplStatus");
+  if(!title){st.textContent="❌ Nom kiriting";st.style.color="var(--red)";return}
+  if(!file){st.textContent="❌ Audio faylni tanlang";st.style.color="var(--red)";return}
+  st.textContent="⏳ Yuklanmoqda...";st.style.color="var(--yellow)";
+  try{
+    var ext=file.name.split(".").pop()||"mp3";
+    var path="templates/"+Date.now()+"_"+Math.random().toString(36).substring(2,6)+"."+ext;
+    var snap=await storage.ref(path).put(file);
+    var url=await snap.ref.getDownloadURL();
+    await db.collection("audioTemplates").add({
+      title:title, audioUrl:url,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    st.textContent="✅ Saqlandi!";st.style.color="var(--green)";
+    document.getElementById("tplTitle").value="";
+    document.getElementById("tplAudioFile").value="";
+    document.getElementById("tplAudioName").textContent="";
+    loadTemplates();
+  }catch(e){st.textContent="❌ Xato: "+e.message;st.style.color="var(--red)";}
+}
+
+function loadTemplates(){
+  var el=document.getElementById("tplList");
+  if(!el)return;
+  el.innerHTML="<div style='color:var(--muted);font-size:13px'>Yuklanmoqda...</div>";
+  db.collection("audioTemplates").orderBy("createdAt","desc").get().then(function(snap){
+    allTemplates=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
+    fillAllTplSelects();
+    if(!allTemplates.length){
+      el.innerHTML="<div style='color:var(--muted);font-size:13px'>Hali shablon qo'shilmagan</div>";
+      return;
+    }
+    var html=allTemplates.map(function(tpl){
+      return "<div style='display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface2);border-radius:10px;margin-bottom:8px'>"+
+        "<div style='flex:1'>"+
+        "<div style='font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px'>"+tpl.title+"</div>"+
+        "<audio controls style='height:30px;width:100%'><source src='"+tpl.audioUrl+"'></audio>"+
+        "</div>"+
+        "<button data-del='"+tpl._id+"' style='padding:5px 10px;border-radius:6px;border:1.5px solid var(--red);background:transparent;color:var(--red);font-size:11px;cursor:pointer;flex-shrink:0'>🗑</button>"+
+        "</div>";
+    }).join("");
+    el.innerHTML=html;
+    el.querySelectorAll("[data-del]").forEach(function(btn){
+      btn.addEventListener("click",function(){
+        if(!confirm("Shu shablonni ochirasizmi?"))return;
+        db.collection("audioTemplates").doc(this.getAttribute("data-del")).delete()
+          .then(function(){loadTemplates()});
+      });
+    });
+  });
+}
+
+function fillAllTplSelects(){
+  var opts="<option value=''>— Shablon —</option>"+
+    allTemplates.map(function(t){
+      return "<option value='"+t.audioUrl+"'>"+t.title+"</option>";
+    }).join("");
+  ["purposeTpl","opt0Tpl","opt1Tpl","opt2Tpl","opt3Tpl",
+   "g2opt0Tpl","g2opt1Tpl","g2opt2Tpl","g2opt3Tpl"].forEach(function(sid){
+    var sel=document.getElementById(sid);
+    if(sel){var cur=sel.value;sel.innerHTML=opts;if(cur)sel.value=cur;}
+  });
+}
+
+function onPurposeTpl(){
+  var sel=document.getElementById("purposeTpl");
+  var preview=document.getElementById("purposeTplPreview");
+  if(sel&&sel.value&&preview){
+    preview.innerHTML="<source src='"+sel.value+"'>";
+    preview.style.display="block";preview.load();
+  } else if(preview){preview.style.display="none";}
+}
+
+function onOptTpl(selId){
+  var sel=document.getElementById(selId);
+  if(!sel||!sel.value)return;
+  var preview=sel.parentElement.querySelector("audio");
+  if(!preview){
+    preview=document.createElement("audio");
+    preview.controls=true;preview.style.cssText="width:100%;height:28px;margin-top:4px;display:block";
+    sel.parentElement.appendChild(preview);
+  }
+  preview.innerHTML="<source src='"+sel.value+"'>";
+  preview.load();preview.play();
+}
+
+
+window.addEventListener("DOMContentLoaded",function(){
+  db.collection("audioTemplates").get().then(function(snap){
+    allTemplates=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
+    fillTplSelects();
+  });
+});
+
 window.addEventListener("DOMContentLoaded",function(){
   buildOptsGrid("optsGrid","","correct");
   buildOptsGrid("g2Grid","g2","g2correct");
+  // Shablonlarni yuklaymiz
+  db.collection("audioTemplates").orderBy("createdAt","desc").get().then(function(snap){
+    allTemplates=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
+    fillAllTplSelects();
+  });
 });
 
 function markCorrect(prefix,idx){
@@ -423,10 +590,14 @@ async function submitQuestion(){
     for(var i=0;i<4;i++){
       var af=document.getElementById("opt"+i+"Audio").files[0];
       var imf=document.getElementById("opt"+i+"Img").files[0];
+      // Shablon audio URL
+      var tplSel=document.getElementById("opt"+i+"Tpl");
+      var tplUrl=tplSel&&tplSel.value?tplSel.value:null;
+      var uploadedAudioUrl=await uploadFile(af,"audio/opt"+i);
       opts1.push({
         text:document.getElementById("opt"+i+"Text").value.trim()||null,
         fontSize:parseInt(document.getElementById("opt"+i+"FS").value),
-        audioUrl:await uploadFile(af,"audio/opt"+i),
+        audioUrl:uploadedAudioUrl||tplUrl,
         imageUrl:await uploadFile(imf,"images/opt"+i)
       });
     }
@@ -436,6 +607,7 @@ async function submitQuestion(){
       topTitleFontSize:parseInt(document.getElementById("topTitleFS").value),
       purpose:document.getElementById("purposeText").value.trim()||null,
       purposeFontSize:parseInt(document.getElementById("purposeFS").value),
+      purposeAudioUrl:selectedPurposeTmpl?selectedPurposeTmpl.audioUrl:null,
       questionText:document.getElementById("questionText").value.trim()||null,
       questionFontSize:parseInt(document.getElementById("questionFS").value),
       questionAudioUrl:qaUrl,questionImageUrl:qiUrl,
@@ -615,5 +787,31 @@ function pvDelete(id){
   });
 }
 </script>
+
+<!-- AUDIO SHABLONLAR -->
+<div id="pageTemplates" style="display:none;max-width:900px;margin:0 auto;padding:28px 20px">
+
+  <!-- Yangi shablon qo'shish -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+    <div style="font-size:14px;font-weight:800;margin-bottom:16px">➕ Yangi audio shablon qo'shish</div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;font-family:'IBM Plex Mono',monospace">NOM (ko'rinadigan matn)</label>
+      <input id="tplTitle" placeholder="Masalan: 다음을 듣고..." style="width:100%;padding:10px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;font-family:'IBM Plex Mono',monospace">AUDIO FAYL</label>
+      <label class="upload-btn">🎧 Audio yuklash<input type="file" id="tplAudioFile" accept="audio/*" onchange="showTplName(this)"></label>
+      <div id="tplAudioName" class="fname"></div>
+    </div>
+    <div id="tplStatus" style="font-size:13px;margin-bottom:10px;min-height:18px"></div>
+    <button onclick="saveTpl()" style="padding:10px 24px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:13px;font-weight:700;cursor:pointer">💾 Saqlash</button>
+  </div>
+
+  <!-- Mavjud shablonlar -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px">
+    <div style="font-size:14px;font-weight:800;margin-bottom:16px">📋 Mavjud shablonlar</div>
+    <div id="tplList"><div style="color:var(--muted);font-size:13px">Yuklanmoqda...</div></div>
+  </div>
+</div>
 </body>
 </html>
