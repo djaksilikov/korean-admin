@@ -51,6 +51,8 @@ header h1{font-size:17px;font-weight:800;background:linear-gradient(90deg,var(--
 .tog-btn.active-m{background:var(--yellow);border-color:transparent;color:#000}
 .tog-btn.active-am{background:#e67e22;border-color:transparent;color:#fff}
 .tog-btn.active-h{background:var(--red);border-color:transparent;color:#fff}
+.tog-btn.active-amh{background:#8e44ad;border-color:transparent;color:#fff}
+.tog-btn.active-hh{background:#2c3e50;border-color:transparent;color:#fff}
 textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;padding:10px 14px;resize:vertical;min-height:70px;outline:none;transition:border-color 0.2s}
 textarea:focus{border-color:var(--accent)}
 input[type=text],input[type=search]{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;padding:10px 14px;outline:none;transition:border-color 0.2s;width:100%}
@@ -179,7 +181,9 @@ select:focus{border-color:var(--accent)}
         <button class="tog-btn" data-val="Easy" data-cls="active-e" onclick="selectDiff(this)">🟡 Easy</button>
         <button class="tog-btn" data-val="Medium" data-cls="active-m" onclick="selectDiff(this)">🟠 Medium</button>
         <button class="tog-btn" data-val="Above Medium" data-cls="active-am" onclick="selectDiff(this)">🟤 Above Medium</button>
+        <button class="tog-btn" data-val="Above Medium Hard" data-cls="active-amh" onclick="selectDiff(this)">🟣 Above Medium Hard</button>
         <button class="tog-btn" data-val="Hard" data-cls="active-h" onclick="selectDiff(this)">🔴 Hard</button>
+        <button class="tog-btn" data-val="Hard Hard" data-cls="active-hh" onclick="selectDiff(this)">⚫ Hard Hard</button>
       </div>
     </div>
   </div>
