@@ -109,18 +109,41 @@ select:focus{border-color:var(--accent)}
 </style>
 </head>
 <body>
-<header>
+<!-- ══ LOGIN EKRANI ══ -->
+<div id="loginPage" style="display:none;min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:400px;margin:20px">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px">🇰🇷</div>
+      <div style="font-size:20px;font-weight:800;color:var(--text)">Korean Test</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;font-family:'IBM Plex Mono',monospace">Admin Panel</div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;display:block;margin-bottom:6px">EMAIL</label>
+      <input id="loginEmail" type="email" placeholder="email@gmail.com" style="width:100%;padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;font-family:'Sora',sans-serif">
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;display:block;margin-bottom:6px">PAROL</label>
+      <input id="loginPassword" type="password" placeholder="••••••••" style="width:100%;padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;font-family:'Sora',sans-serif">
+    </div>
+    <div id="loginError" style="font-size:12px;color:var(--red);margin-bottom:12px;min-height:18px;font-family:'IBM Plex Mono',monospace"></div>
+    <button id="loginBtn" onclick="doLogin()" style="width:100%;padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">
+      🔐 Kirish
+    </button>
+  </div>
+</div>
+<header style="display:none">
   <div class="logo">🇰🇷</div>
   <h1>Korean Test — Admin Panel</h1>
   <div style="display:flex;gap:8px;margin-left:auto">
     <button id="tabAdd" onclick="showTab('add')" style="padding:7px 16px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">➕ Yangi savol</button>
     <button id="tabPreview" onclick="showTab('preview')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">👁 Ko&#39;rinish &amp; Tahrir</button>
     <button id="tabTemplates" onclick="showTab('templates')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #2a3045;background:transparent;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">🎧 Audio shablonlar</button>
+    <button onclick="doLogout()" style="padding:7px 16px;border-radius:8px;border:1.5px solid #e74c3c;background:transparent;color:#e74c3c;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">🚪 Chiqish</button>
   </div>
 </header>
 
 <!-- ══ YANGI SAVOL ══ -->
-<div id="pageAdd" class="container">
+<div id="pageAdd" class="container" style="display:none">
   <div class="card">
     <div class="card-header"><div class="step">1</div><h2>Bo'lim tanlash</h2><span class="badge-req">majburiy</span></div>
     <div class="card-body">
@@ -319,6 +342,7 @@ select:focus{border-color:var(--accent)}
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script>
@@ -332,6 +356,61 @@ firebase.initializeApp({
 });
 var db=firebase.firestore();
 var storage=firebase.storage();
+var auth=firebase.auth();
+
+// ══ AUTH ══
+auth.onAuthStateChanged(function(user){
+  var loginPage=document.getElementById("loginPage");
+  var header=document.querySelector("header");
+  var pageAdd=document.getElementById("pageAdd");
+  var pagePreview=document.getElementById("pagePreview");
+  var pageTemplates=document.getElementById("pageTemplates");
+  if(user){
+    // Kirdi — login sahifasini yashiramiz
+    if(loginPage) loginPage.style.display="none";
+    if(header) header.style.display="flex";
+    if(pageAdd) pageAdd.style.display="block";
+  } else {
+    // Chiqdi — login sahifasini ko'rsatamiz
+    if(loginPage) loginPage.style.display="flex";
+    if(header) header.style.display="none";
+    if(pageAdd) pageAdd.style.display="none";
+    if(pagePreview) pagePreview.style.display="none";
+    if(pageTemplates) pageTemplates.style.display="none";
+  }
+});
+
+function doLogin(){
+  var email=document.getElementById("loginEmail").value.trim();
+  var pass=document.getElementById("loginPassword").value;
+  var errEl=document.getElementById("loginError");
+  var btn=document.getElementById("loginBtn");
+  if(!email||!pass){errEl.textContent="Email va parolni kiriting";return;}
+  btn.textContent="⏳ Kirilmoqda...";btn.disabled=true;
+  auth.signInWithEmailAndPassword(email,pass)
+    .then(function(){
+      errEl.textContent="";
+      btn.textContent="🔐 Kirish";btn.disabled=false;
+    })
+    .catch(function(e){
+      var msg="Xato: noto'g'ri email yoki parol";
+      errEl.textContent=msg;
+      btn.textContent="🔐 Kirish";btn.disabled=false;
+    });
+}
+
+function doLogout(){
+  if(confirm("Chiqasizmi?")){
+    auth.signOut();
+  }
+}
+
+// Enter tugmasi bilan login
+document.addEventListener("DOMContentLoaded",function(){
+  document.getElementById("loginPassword").addEventListener("keydown",function(e){
+    if(e.key==="Enter") doLogin();
+  });
+});
 var selectedTestType="Reading";
 var hasGroupQ=false;
 var NUMS=["①","②","③","④"];
