@@ -148,7 +148,7 @@ select:focus{border-color:var(--accent)}
     <div class="card-header"><div class="step">1</div><h2>Bo'lim tanlash</h2><span class="badge-req">majburiy</span></div>
     <div class="card-body">
       <div class="btn-group" id="sectionGroup">
-        <button class="tog-btn" data-val="EPS TOPIK" onclick="selectSection(this)">EPS TOPIK</button>
+        <button class="tog-btn" data-val="Interactive EPS" onclick="selectSection(this)">Interactive EPS</button>
         <button class="tog-btn" data-val="TOPIK 1" onclick="selectSection(this)">TOPIK 1</button>
         <button class="tog-btn" data-val="TOPIK 2" onclick="selectSection(this)">TOPIK 2</button>
       </div>
@@ -295,7 +295,7 @@ select:focus{border-color:var(--accent)}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
       <input id="pvSearch" type="search" placeholder="Matn qidirish..." style="flex:1;min-width:160px;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none">
       <select id="pvSection" style="padding:9px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:12px">
-        <option value="">Barcha bolim</option><option>EPS TOPIK</option><option>TOPIK 1</option><option>TOPIK 2</option>
+        <option value="">Barcha bolim</option><option>Interactive EPS</option><option>TOPIK 1</option><option>TOPIK 2</option>
       </select>
       <select id="pvType" style="padding:9px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:12px">
         <option value="">Barcha tur</option><option value="Reading">Reading</option><option value="Listening">Listening</option>
@@ -751,7 +751,7 @@ function pvLoad(){
     document.getElementById("pvStatus").textContent=pvItems.length+" ta savol topildi";
     if(!pvItems.length){el.innerHTML="<div style='color:var(--muted);font-size:13px;text-align:center;padding:30px'>Topilmadi</div>";return;}
     el.innerHTML=pvItems.map(function(item){
-      var sc={"EPS TOPIK":"#4f8ef7","TOPIK 1":"#2ecc71","TOPIK 2":"#f1c40f"}[item.section]||"#6b7280";
+      var sc={"Interactive EPS":"#4f8ef7","TOPIK 1":"#2ecc71","TOPIK 2":"#f1c40f"}[item.section]||"#6b7280";
       var txt=(item.purpose||item.questionText||"—").substring(0,70);
       return "<div class='pv-item' data-id='"+item._id+"'>"+
         "<div style='display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px'>"+
