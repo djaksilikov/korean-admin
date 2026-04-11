@@ -257,8 +257,26 @@ select:focus{border-color:var(--accent)}
   </div>
 
   <div class="submit-area">
+    <button type="button" onclick="showPreviewModal()" style="padding:12px 32px;border-radius:12px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px">👁 Ilovada ko'rish</button>
+    <br>
     <button id="submitBtn" onclick="submitQuestion()">🚀 Firebase ga yuborish</button>
     <div id="statusMsg" class="status-msg"></div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div id="previewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center">
+    <div style="background:#1e2330;border-radius:24px;padding:24px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;position:relative">
+      <button onclick="closePreviewModal()" style="position:absolute;top:14px;right:14px;background:transparent;border:none;color:#6b7280;font-size:20px;cursor:pointer">✕</button>
+      <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:16px;font-family:'IBM Plex Mono',monospace">📱 Ilova ko'rinishi</div>
+
+      <!-- iPhone frame -->
+      <div id="phonePreview" style="background:#E8ECF0;border-radius:24px;padding:16px;min-height:300px;box-shadow:6px 6px 14px #C8CDD4,-6px -6px 14px #fff">
+        <div style="color:#8E97A5;font-size:12px;text-align:center;padding:20px 0">Ko'rish uchun yuqoridagi tugmani bosing</div>
+      </div>
+
+      <!-- Variant bosish simulyatsiyasi -->
+      <div style="margin-top:14px;font-size:11px;color:#6b7280;text-align:center;font-family:'IBM Plex Mono',monospace">Variantni bosib ko'ring → natijani ko'rasiz</div>
+    </div>
   </div>
 </div>
 
@@ -434,6 +452,127 @@ function buildOptsGrid(containerId,namePrefix,radioName){
       "</div>";
   }).join("");
 }
+
+// ── PREVIEW ──
+var previewCorrectIndex = -1;
+var previewSelected = null;
+
+function showPreviewModal(){
+  var modal = document.getElementById("previewModal");
+  modal.style.display = "flex";
+  renderPhonePreview(-1); // hech narsa tanlanmagan
+}
+
+function closePreviewModal(){
+  document.getElementById("previewModal").style.display = "none";
+  previewSelected = null;
+}
+
+function renderPhonePreview(selectedIdx){
+  var phone = document.getElementById("phonePreview");
+
+  // Ma'lumotlarni olamiz
+  var purpose = document.getElementById("purposeText").value.trim();
+  var qText   = document.getElementById("questionText").value.trim();
+  var correct = document.querySelector("input[name='correct']:checked");
+  previewCorrectIndex = correct ? parseInt(correct.value) : -1;
+
+  var opts = [];
+  for(var i=0;i<4;i++){
+    opts.push(document.getElementById("opt"+i+"Text").value.trim());
+  }
+
+  // Rasm preview
+  var qImg = document.getElementById("qImgPreview");
+  var hasImg = qImg && qImg.src && qImg.style.display !== "none";
+
+  // Audio
+  var qAudio = document.getElementById("qAudioFile").files[0];
+
+  var html = "";
+
+  // Maqsad
+  if(purpose){
+    html += "<div style='background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;font-size:14px;color:#4A5568;text-align:center;box-shadow:3px 3px 8px #C8CDD4,-3px -3px 8px #fff;line-height:1.6;font-family:sans-serif'>"+fmtText(purpose)+"</div>";
+  }
+
+  // Savol matni
+  if(qText){
+    var isShort = qText.length <= 40;
+    html += "<div style='background:#E8ECF0;border-radius:12px;padding:12px;margin-bottom:10px;font-size:14px;color:#4A5568;box-shadow:inset 2px 2px 6px #C8CDD4,inset -2px -2px 6px #fff;line-height:1.6;font-family:sans-serif;text-align:"+(isShort?"center":"left")+"'>"+fmtText(qText)+"</div>";
+  }
+
+  // Audio
+  if(qAudio){
+    html += "<div style='background:#E8ECF0;border-radius:14px;padding:10px;margin-bottom:10px;display:flex;align-items:center;gap:10px;box-shadow:4px 4px 10px #C8CDD4,-4px -4px 10px #fff'><div style='width:36px;height:36px;border-radius:50%;background:#5B6EF0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px'>▶</div><div style='font-size:11px;color:#5B6EF0;font-weight:600'>"+qAudio.name+"</div></div>";
+  }
+
+  // Rasm
+  if(hasImg){
+    html += "<img src='"+qImg.src+"' style='width:100%;border-radius:10px;margin-bottom:10px;max-height:160px;object-fit:contain'>";
+  }
+
+  // Variantlar
+  var nums = ["①","②","③","④"];
+  for(var j=0;j<4;j++){
+    if(!opts[j]) continue;
+    var isSelected = selectedIdx === j;
+    var isCorrect  = previewCorrectIndex === j;
+    var showResult = selectedIdx !== -1;
+
+    var bgStyle, numBg, numColor;
+    if(!showResult){
+      bgStyle  = "background:#E8ECF0;box-shadow:3px 3px 7px #C8CDD4,-3px -3px 7px #fff";
+      numBg    = "#E8ECF0";
+      numColor = "#4A5568";
+    } else if(isCorrect){
+      bgStyle  = "background:rgba(72,187,120,0.12);border:1.5px solid #48BB78";
+      numBg    = "#48BB78";
+      numColor = "#fff";
+    } else if(isSelected){
+      bgStyle  = "background:rgba(231,76,60,0.08);border:1.5px solid #e74c3c";
+      numBg    = "#e74c3c";
+      numColor = "#fff";
+    } else {
+      bgStyle  = "background:#E8ECF0;opacity:0.6";
+      numBg    = "#E8ECF0";
+      numColor = "#4A5568";
+    }
+
+    var checkIcon = showResult && isCorrect  ? "<span style='color:#48BB78;font-size:18px;margin-left:auto'>✓</span>" : "";
+    var wrongIcon = showResult && isSelected && !isCorrect ? "<span style='color:#e74c3c;font-size:18px;margin-left:auto'>✗</span>" : "";
+
+    html += "<div style='border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;cursor:pointer;"+bgStyle+"' onclick='renderPhonePreview("+j+")'>"+
+      "<div style='width:30px;height:30px;border-radius:8px;background:"+numBg+";color:"+numColor+";display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;box-shadow:2px 2px 5px #C8CDD4,-2px -2px 5px #fff'>"+nums[j]+"</div>"+
+      "<div style='font-size:13px;color:#4A5568;flex:1;font-family:sans-serif;line-height:1.5'>"+fmtText(opts[j])+"</div>"+
+      checkIcon+wrongIcon+
+      "</div>";
+  }
+
+  if(!purpose && !qText && opts.every(function(o){return !o})){
+    html = "<div style='color:#8E97A5;font-size:12px;text-align:center;padding:30px 0'>Savol ma'lumotlarini kiriting</div>";
+  }
+
+  phone.innerHTML = html;
+}
+
+function fmtText(txt){
+  if(!txt) return "";
+  // __matn__ → osti chizilgan
+  txt = txt.replace(/__([^_]+)__/g, "<u style='color:#5B6EF0'>$1</u>");
+  // _____ → bo'sh joy
+  txt = txt.replace(/_{3,}/g, "<u style='color:#5B6EF0;display:inline-block;min-width:60px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>");
+  // / → yangi qator
+  txt = txt.replace(/\//g, "<br>");
+  // < > → qoraytirilgan
+  txt = txt.replace(/<([^>]+)>/g, "<span style='background:rgba(0,0,0,0.08);border-radius:4px;padding:2px 4px'>$1</span>");
+  return txt;
+}
+
+// Modal tashqarisini bossa yopiladi
+document.getElementById("previewModal").addEventListener("click", function(e){
+  if(e.target === this) closePreviewModal();
+});
 
 window.addEventListener("DOMContentLoaded",function(){
   buildOptsGrid("optsGrid","","correct");
@@ -641,13 +780,15 @@ async function submitQuestion(){
       opts1.push({
         text:document.getElementById("opt"+i+"Text").value.trim()||null,
         fontSize:parseInt(document.getElementById("opt"+i+"FS").value),
-        audioUrl:uploadedAu||tplUrl,
+        templateAudioUrl:tplUrl||null,
+        audioUrl:uploadedAu||null,
         imageUrl:await uploadFile(imf,"images/opt"+i)
       });
     }
     var purposeTplSel=document.getElementById("purposeTpl");
     var q1={
       section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
+      purposeAudioUrl:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
       purpose:document.getElementById("purposeText").value.trim()||null,
       purposeFontSize:parseInt(document.getElementById("purposeFS").value),
       purposeAudioUrl:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
