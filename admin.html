@@ -727,10 +727,11 @@ function loadTemplates(){
 }
 
 function fillAllTplSelects(){
-  // value = "id::audioUrl" formatida — ikkalasini birga saqlaymiz
+  // value = "id" formatida — URL ni allTemplates dan topamiz
   var opts="<option value=''>— Shablon —</option>"+
     allTemplates.map(function(t){
-      return "<option value='"+t._id+"::"+t.audioUrl+"'>"+t.title+"</option>";
+      var safeTitle=t.title.replace(/'/g,"&#39;");
+      return "<option value='"+t._id+"'>"+safeTitle+"</option>";
     }).join("");
   ["purposeTpl","opt0Tpl","opt1Tpl","opt2Tpl","opt3Tpl","g2opt0Tpl","g2opt1Tpl","g2opt2Tpl","g2opt3Tpl"].forEach(function(sid){
     var sel=document.getElementById(sid);
@@ -742,10 +743,10 @@ function onPurposeTpl(){
   var sel=document.getElementById("purposeTpl");
   var preview=document.getElementById("purposeTplPreview");
   if(sel&&sel.value&&preview){
-    var parts=sel.value.split("::");
-    var audioUrl=parts[1]||"";
-    if(audioUrl){
-      preview.innerHTML="<source src='"+audioUrl+"'>";
+    var tplId=sel.value;
+    var tpl=allTemplates.find(function(t){return t._id===tplId;});
+    if(tpl&&tpl.audioUrl){
+      preview.innerHTML="<source src='"+tpl.audioUrl+"'>";
       preview.style.display="block";preview.load();
     }
   } else if(preview){preview.style.display="none";}
@@ -855,9 +856,9 @@ async function submitQuestion(){
       var af=document.getElementById("opt"+i+"Audio").files[0];
       var imf=document.getElementById("opt"+i+"Img").files[0];
       var tplSel=document.getElementById("opt"+i+"Tpl");
-      var tplRaw=tplSel&&tplSel.value?tplSel.value:"";
-      var tplId=tplRaw?tplRaw.split("::")[0]:null;
-      var tplAudioUrl=tplRaw?tplRaw.split("::")[1]:null;
+      var tplId=tplSel&&tplSel.value?tplSel.value:null;
+      var tplObj=tplId?allTemplates.find(function(t){return t._id===tplId;}):null;
+      var tplAudioUrl=tplObj?tplObj.audioUrl:null;
       var uploadedAu=await uploadFile(af,"audio/opt"+i);
       opts1.push({
         text:document.getElementById("opt"+i+"Text").value.trim()||null,
@@ -871,12 +872,12 @@ async function submitQuestion(){
     var purposeTplSel=document.getElementById("purposeTpl");
     var q1={
       section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
-      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value.split("::")[0]:null,
-      purposeAudioUrl:purposeTplSel&&purposeTplSel.value?purposeTplSel.value.split("::")[1]:null,
+      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
+      purposeAudioUrl:(function(){var tpl=purposeTplSel&&purposeTplSel.value?allTemplates.find(function(t){return t._id===purposeTplSel.value;}):null;return tpl?tpl.audioUrl:null;})(),
       purpose:document.getElementById("purposeText").value.trim()||null,
       purposeFontSize:parseInt(document.getElementById("purposeFS").value),
-      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value.split("::")[0]:null,
-      purposeAudioUrl:purposeTplSel&&purposeTplSel.value?purposeTplSel.value.split("::")[1]:null,
+      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
+      purposeAudioUrl:(function(){var tpl=purposeTplSel&&purposeTplSel.value?allTemplates.find(function(t){return t._id===purposeTplSel.value;}):null;return tpl?tpl.audioUrl:null;})(),
       questionText:document.getElementById("questionText").value.trim()||null,
       questionFontSize:parseInt(document.getElementById("questionFS").value),
       questionAudioUrl:qaUrl,questionImageUrl:qiUrl,
