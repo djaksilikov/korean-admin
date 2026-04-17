@@ -727,9 +727,10 @@ function loadTemplates(){
 }
 
 function fillAllTplSelects(){
+  // value = "id::audioUrl" formatida — ikkalasini birga saqlaymiz
   var opts="<option value=''>— Shablon —</option>"+
     allTemplates.map(function(t){
-      return "<option value='"+t._id+"'>"+t.title+"</option>";
+      return "<option value='"+t._id+"::"+t.audioUrl+"'>"+t.title+"</option>";
     }).join("");
   ["purposeTpl","opt0Tpl","opt1Tpl","opt2Tpl","opt3Tpl","g2opt0Tpl","g2opt1Tpl","g2opt2Tpl","g2opt3Tpl"].forEach(function(sid){
     var sel=document.getElementById(sid);
@@ -741,9 +742,10 @@ function onPurposeTpl(){
   var sel=document.getElementById("purposeTpl");
   var preview=document.getElementById("purposeTplPreview");
   if(sel&&sel.value&&preview){
-    var tpl=allTemplates.find(function(t){return t._id===sel.value;});
-    if(tpl){
-      preview.innerHTML="<source src='"+tpl.audioUrl+"'>";
+    var parts=sel.value.split("::");
+    var audioUrl=parts[1]||"";
+    if(audioUrl){
+      preview.innerHTML="<source src='"+audioUrl+"'>";
       preview.style.display="block";preview.load();
     }
   } else if(preview){preview.style.display="none";}
@@ -853,12 +855,15 @@ async function submitQuestion(){
       var af=document.getElementById("opt"+i+"Audio").files[0];
       var imf=document.getElementById("opt"+i+"Img").files[0];
       var tplSel=document.getElementById("opt"+i+"Tpl");
-      var tplId=tplSel&&tplSel.value?tplSel.value:null;
+      var tplRaw=tplSel&&tplSel.value?tplSel.value:"";
+      var tplId=tplRaw?tplRaw.split("::")[0]:null;
+      var tplAudioUrl=tplRaw?tplRaw.split("::")[1]:null;
       var uploadedAu=await uploadFile(af,"audio/opt"+i);
       opts1.push({
         text:document.getElementById("opt"+i+"Text").value.trim()||null,
         fontSize:parseInt(document.getElementById("opt"+i+"FS").value),
         templateId:tplId||null,
+        templateAudioUrl:tplAudioUrl||null,
         audioUrl:uploadedAu||null,
         imageUrl:await uploadFile(imf,"images/opt"+i)
       });
@@ -866,10 +871,12 @@ async function submitQuestion(){
     var purposeTplSel=document.getElementById("purposeTpl");
     var q1={
       section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
-      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
+      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value.split("::")[0]:null,
+      purposeAudioUrl:purposeTplSel&&purposeTplSel.value?purposeTplSel.value.split("::")[1]:null,
       purpose:document.getElementById("purposeText").value.trim()||null,
       purposeFontSize:parseInt(document.getElementById("purposeFS").value),
-      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
+      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value.split("::")[0]:null,
+      purposeAudioUrl:purposeTplSel&&purposeTplSel.value?purposeTplSel.value.split("::")[1]:null,
       questionText:document.getElementById("questionText").value.trim()||null,
       questionFontSize:parseInt(document.getElementById("questionFS").value),
       questionAudioUrl:qaUrl,questionImageUrl:qiUrl,
