@@ -870,14 +870,11 @@ async function submitQuestion(){
       var imf=document.getElementById("opt"+i+"Img").files[0];
       var tplSel=document.getElementById("opt"+i+"Tpl");
       var tplId=tplSel&&tplSel.value?tplSel.value:null;
-      var tplObj=tplId?allTemplates.find(function(t){return t._id===tplId;}):null;
-      var tplAudioUrl=tplObj?tplObj.audioUrl:null;
       var uploadedAu=await uploadFile(af,"audio/opt"+i);
       opts1.push({
         text:document.getElementById("opt"+i+"Text").value.trim()||null,
         fontSize:parseInt(document.getElementById("opt"+i+"FS").value),
         templateId:tplId||null,
-        templateAudioUrl:tplAudioUrl||null,
         audioUrl:uploadedAu||null,
         imageUrl:await uploadFile(imf,"images/opt"+i)
       });
@@ -886,11 +883,9 @@ async function submitQuestion(){
     var q1={
       section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
       purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
-      purposeAudioUrl:(function(){var tpl=purposeTplSel&&purposeTplSel.value?allTemplates.find(function(t){return t._id===purposeTplSel.value;}):null;return tpl?tpl.audioUrl:null;})(),
       purpose:document.getElementById("purposeText").value.trim()||null,
       purposeFontSize:parseInt(document.getElementById("purposeFS").value),
       purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
-      purposeAudioUrl:(function(){var tpl=purposeTplSel&&purposeTplSel.value?allTemplates.find(function(t){return t._id===purposeTplSel.value;}):null;return tpl?tpl.audioUrl:null;})(),
       questionText:document.getElementById("questionText").value.trim()||null,
       questionFontSize:parseInt(document.getElementById("questionFS").value),
       questionAudioUrl:qaUrl,questionImageUrl:qiUrl,
