@@ -282,6 +282,24 @@ select:focus{border-color:var(--accent)}
 
 <!-- ══ AUDIO SHABLONLAR ══ -->
 <div id="pageTemplates" style="display:none;max-width:900px;margin:0 auto;padding:28px 20px">
+
+  <!-- Tugma ovozi -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+    <div style="font-size:14px;font-weight:800;margin-bottom:4px">🔊 Tugma bosilish ovozi</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;font-family:'IBM Plex Mono',monospace">Foydalanuvchi variant bosganida chiqadigan kichik ovoz</div>
+    <div id="tapSoundCurrent" style="font-size:12px;color:var(--muted);margin-bottom:12px">⏳ Yuklanmoqda...</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <label class="upload-btn">🎧 MP3 yuklash<input type="file" id="tapSoundFile" accept="audio/*" onchange="showTapName(this)"></label>
+      <div id="tapSoundName" style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace"></div>
+    </div>
+    <div id="tapSoundStatus" style="font-size:13px;min-height:18px;padding:8px 0"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="saveTapSound()" class="btn btn-blue">💾 Saqlash</button>
+      <button onclick="previewTapSound()" style="padding:8px 18px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer">▶ Tinglash</button>
+    </div>
+    <audio id="tapSoundPreview" style="display:none;width:100%;margin-top:10px" controls></audio>
+  </div>
+
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
     <div style="font-size:14px;font-weight:800;margin-bottom:16px">➕ Yangi audio shablon qo'shish</div>
     <div class="field">
@@ -583,6 +601,63 @@ window.addEventListener("DOMContentLoaded",function(){
     fillAllTplSelects();
   });
 });
+
+
+// ══ TUGMA OVOZI ══
+var currentTapUrl = "";
+
+function showTapName(inp) {
+  var el = document.getElementById("tapSoundName");
+  if(inp.files[0] && el) el.textContent = "✅ " + inp.files[0].name;
+}
+
+function previewTapSound() {
+  var preview = document.getElementById("tapSoundPreview");
+  if(!preview) return;
+  if(currentTapUrl) {
+    preview.src = currentTapUrl;
+    preview.style.display = "block";
+    preview.play();
+  }
+}
+
+async function saveTapSound() {
+  var fileEl = document.getElementById("tapSoundFile");
+  var st = document.getElementById("tapSoundStatus");
+  if(!fileEl || !fileEl.files[0]) { st.textContent = "❌ Fayl tanlang"; st.style.color = "var(--red)"; return; }
+  st.textContent = "⏳ Yuklanmoqda..."; st.style.color = "var(--yellow)";
+  try {
+    var file = fileEl.files[0];
+    var ext = file.name.split(".").pop() || "mp3";
+    var path = "sounds/tapSound_" + Date.now() + "." + ext;
+    var snap = await storage.ref(path).put(file);
+    var url = await snap.ref.getDownloadURL();
+    await db.collection("appSettings").doc("sounds").set({ tapSoundUrl: url }, { merge: true });
+    currentTapUrl = url;
+    st.textContent = "✅ Saqlandi! URL: " + url.substring(0, 60) + "...";
+    st.style.color = "var(--green)";
+    loadTapSoundInfo();
+  } catch(e) {
+    st.textContent = "❌ Xato: " + e.message;
+    st.style.color = "var(--red)";
+  }
+}
+
+function loadTapSoundInfo() {
+  db.collection("appSettings").doc("sounds").get().then(function(snap) {
+    var el = document.getElementById("tapSoundCurrent");
+    if(!el) return;
+    if(snap.exists && snap.data().tapSoundUrl) {
+      currentTapUrl = snap.data().tapSoundUrl;
+      el.innerHTML = "✅ Hozirgi ovoz: <span style=\"color:var(--green);font-family:IBM Plex Mono,monospace;font-size:11px\">" +
+        currentTapUrl.substring(0, 70) + "...</span>";
+      var preview = document.getElementById("tapSoundPreview");
+      if(preview) { preview.src = currentTapUrl; preview.style.display = "block"; }
+    } else {
+      el.textContent = "❌ Hali ovoz qo'shilmagan";
+    }
+  });
+}
 
 // ══ SHABLONLAR ══
 function showTplName(inp){
