@@ -699,28 +699,41 @@ async function saveTpl(){
 function loadTemplates(){
   var el=document.getElementById("tplList");
   if(!el)return;
-  el.innerHTML="<div style='color:var(--muted);font-size:13px'>Yuklanmoqda...</div>";
+  el.innerHTML="<div style='color:var(--muted);font-size:13px'>⏳ Yuklanmoqda...</div>";
   db.collection("audioTemplates").orderBy("createdAt","desc").get().then(function(snap){
-    allTemplates=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
+    var loaded=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
+    // Faqat bo'sh bo'lmasa yangilaymiz
+    if(loaded.length>0) allTemplates=loaded;
     fillAllTplSelects();
     if(!allTemplates.length){
       el.innerHTML="<div style='color:var(--muted);font-size:13px'>Hali shablon qo'shilmagan</div>";
       return;
     }
-    el.innerHTML=allTemplates.map(function(tpl){
-      return "<div class='tpl-item'>"+
-        "<div style='flex:1'>"+
-        "<div style='font-size:13px;font-weight:700;margin-bottom:6px'>"+tpl.title+"</div>"+
-        "<audio controls style='height:30px;width:100%'><source src='"+tpl.audioUrl+"'></audio>"+
-        "</div>"+
-        "<button data-del='"+tpl._id+"' style='padding:5px 10px;border-radius:6px;border:1.5px solid var(--red);background:transparent;color:var(--red);font-size:11px;cursor:pointer;flex-shrink:0'>🗑</button>"+
-        "</div>";
-    }).join("");
-    el.querySelectorAll("[data-del]").forEach(function(btn){
-      btn.addEventListener("click",function(){
-        if(!confirm("Bu shablonni ochirasizmi?"))return;
-        db.collection("audioTemplates").doc(this.getAttribute("data-del")).delete()
-          .then(function(){loadTemplates();});
+    renderTplList(el);
+  }).catch(function(e){
+    el.innerHTML="<div style='color:var(--red);font-size:13px'>❌ Yuklanmadi: "+e.message+"</div>";
+    // Eski ma'lumotlarni ko'rsatamiz
+    if(allTemplates.length) renderTplList(el);
+  });
+}
+
+function renderTplList(el){
+  el.innerHTML=allTemplates.map(function(tpl){
+    return "<div class='tpl-item'>"+
+      "<div style='flex:1'>"+
+      "<div style='font-size:13px;font-weight:700;margin-bottom:6px'>"+tpl.title+"</div>"+
+      "<audio controls style='height:30px;width:100%'><source src='"+tpl.audioUrl+"'></audio>"+
+      "</div>"+
+      "<button data-del='"+tpl._id+"' style='padding:5px 10px;border-radius:6px;border:1.5px solid var(--red);background:transparent;color:var(--red);font-size:11px;cursor:pointer;flex-shrink:0'>🗑</button>"+
+      "</div>";
+  }).join("");
+  el.querySelectorAll("[data-del]").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      if(!confirm("Bu shablonni ochirasizmi?"))return;
+      var delId=this.getAttribute("data-del");
+      db.collection("audioTemplates").doc(delId).delete().then(function(){
+        allTemplates=allTemplates.filter(function(t){return t._id!==delId;});
+        loadTemplates();
       });
     });
   });
