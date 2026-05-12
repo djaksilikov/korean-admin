@@ -37,6 +37,7 @@ header h1{font-size:17px;font-weight:800;background:linear-gradient(90deg,var(--
 .card-header{padding:13px 20px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
 .card-header .step{width:24px;height:24px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
 .card-header h2{font-size:13px;font-weight:700}
+.badge-topik{background:linear-gradient(135deg,#e67e22,#e74c3c);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase}
 .badge-req{margin-left:auto;font-size:10px;font-family:'IBM Plex Mono',monospace;padding:2px 8px;border-radius:20px;color:var(--red);background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.2)}
 .badge-opt{margin-left:auto;font-size:10px;font-family:'IBM Plex Mono',monospace;padding:2px 8px;border-radius:20px;color:var(--muted);background:var(--bg);border:1px solid var(--border)}
 .card-body{padding:16px 20px}
@@ -208,6 +209,19 @@ select:focus{border-color:var(--accent)}
         <button class="tog-btn" data-val="Hard" data-cls="active-h" onclick="selectDiff(this)">🔴 Hard</button>
         <button class="tog-btn" data-val="Hard Hard" data-cls="active-hh" onclick="selectDiff(this)">⚫ Hard Hard</button>
       </div>
+    </div>
+  </div>
+
+  <!-- TOPIK 1 uchun ball maydoni -->
+  <div class="card" id="ballCard" style="display:none">
+    <div class="card-header"><div class="step" style="background:linear-gradient(135deg,#e67e22,#e74c3c)">★</div><h2>Savol balli</h2><span class="badge-req">TOPIK 1</span></div>
+    <div class="card-body">
+      <p class="hint" style="margin-bottom:12px">⭐ Ushbu savol necha ball ekanligini kiriting. Foydalanuvchi savolni yechayotganda ko'radi.</p>
+      <div style="display:flex;align-items:center;gap:12px">
+        <input type="number" id="questionBall" min="1" max="10" step="0.5" placeholder="Masalan: 2" style="width:120px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--input-bg);color:var(--text);font-size:16px;font-weight:700;font-family:'Sora',sans-serif">
+        <span style="font-size:13px;color:var(--muted)">ball (1–10 orasida)</span>
+      </div>
+      <p class="hint" style="margin-top:10px">💡 Agar bo'sh qoldirsangiz, avtomatik hisoblanadi: 200 ÷ 70 ≈ 2.86 ball</p>
     </div>
   </div>
 
@@ -787,7 +801,17 @@ function wrapUnderline(id){
   ta.dispatchEvent(new Event("input"));
 }
 function selectSection(btn){
-  document.querySelectorAll("#sectionGroup .tog-btn").forEach(function(b){b.classList.remove("active-section")});
+  document.querySelectorAll("#sectionGroup .tog-btn").forEach(function(b){b.classList.remove("active-section")
+  // Ball kartasini ko'rsatish/yashirish
+  const ballCard = document.getElementById('ballCard');
+  if(ballCard) ballCard.style.display = btn.dataset.val === 'TOPIK 1' ? 'block' : 'none';
+  // TOPIK 1 da qiyinlik: faqat Easy/Medium/Hard
+  const diffGroup = document.getElementById('diffGroup');
+  if(diffGroup){
+    const epsOnly = diffGroup.querySelectorAll('[data-val="Very Easy"],[data-val="Above Medium"],[data-val="Above Medium Hard"],[data-val="Hard Hard"]');
+    epsOnly.forEach(b => b.style.display = btn.dataset.val === 'TOPIK 1' ? 'none' : '');
+  }
+});
   btn.classList.add("active-section");
 }
 function selectType(type,btn){
