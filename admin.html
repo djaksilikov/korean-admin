@@ -55,8 +55,8 @@ header h1{font-size:17px;font-weight:800;background:linear-gradient(90deg,var(--
 .tog-btn.active-e{background:#2ecc71;border-color:transparent;color:#fff}
 .tog-btn.active-m{background:var(--yellow);border-color:transparent;color:#000}
 .tog-btn.active-am{background:#e67e22;border-color:transparent;color:#fff}
-.tog-btn.active-h{background:var(--red);border-color:transparent;color:#fff}
 .tog-btn.active-amh{background:#8e44ad;border-color:transparent;color:#fff}
+.tog-btn.active-h{background:var(--red);border-color:transparent;color:#fff}
 .tog-btn.active-hh{background:#2c3e50;border-color:transparent;color:#fff}
 textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;padding:10px 14px;resize:vertical;min-height:70px;outline:none;transition:border-color 0.2s}
 textarea:focus{border-color:var(--accent)}
@@ -522,7 +522,7 @@ var previewSelected = null;
 function showPreviewModal(){
   var modal = document.getElementById("previewModal");
   modal.style.display = "flex";
-  renderPhonePreview(-1); // hech narsa tanlanmagan
+  renderPhonePreview(-1);
 }
 
 function closePreviewModal(){
@@ -532,56 +532,37 @@ function closePreviewModal(){
 
 function renderPhonePreview(selectedIdx){
   var phone = document.getElementById("phonePreview");
-
-  // Ma'lumotlarni olamiz
   var purpose = document.getElementById("purposeText").value.trim();
   var qText   = document.getElementById("questionText").value.trim();
   var correct = document.querySelector("input[name='correct']:checked");
   previewCorrectIndex = correct ? parseInt(correct.value) : -1;
-
   var opts = [];
   for(var i=0;i<4;i++){
     opts.push(document.getElementById("opt"+i+"Text").value.trim());
   }
-
-  // Rasm preview
   var qImg = document.getElementById("qImgPreview");
   var hasImg = qImg && qImg.src && qImg.style.display !== "none";
-
-  // Audio
   var qAudio = document.getElementById("qAudioFile").files[0];
-
   var html = "";
-
-  // Maqsad
   if(purpose){
     html += "<div style='background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;font-size:14px;color:#4A5568;text-align:center;box-shadow:3px 3px 8px #C8CDD4,-3px -3px 8px #fff;line-height:1.6;font-family:sans-serif'>"+fmtText(purpose)+"</div>";
   }
-
-  // Savol matni
   if(qText){
     var isShort = qText.length <= 40;
     html += "<div style='background:#E8ECF0;border-radius:12px;padding:12px;margin-bottom:10px;font-size:14px;color:#4A5568;box-shadow:inset 2px 2px 6px #C8CDD4,inset -2px -2px 6px #fff;line-height:1.6;font-family:sans-serif;text-align:"+(isShort?"center":"left")+"'>"+fmtText(qText)+"</div>";
   }
-
-  // Audio
   if(qAudio){
     html += "<div style='background:#E8ECF0;border-radius:14px;padding:10px;margin-bottom:10px;display:flex;align-items:center;gap:10px;box-shadow:4px 4px 10px #C8CDD4,-4px -4px 10px #fff'><div style='width:36px;height:36px;border-radius:50%;background:#5B6EF0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px'>▶</div><div style='font-size:11px;color:#5B6EF0;font-weight:600'>"+qAudio.name+"</div></div>";
   }
-
-  // Rasm
   if(hasImg){
     html += "<img src='"+qImg.src+"' style='width:100%;border-radius:10px;margin-bottom:10px;max-height:160px;object-fit:contain'>";
   }
-
-  // Variantlar
   var nums = ["①","②","③","④"];
   for(var j=0;j<4;j++){
     if(!opts[j]) continue;
     var isSelected = selectedIdx === j;
     var isCorrect  = previewCorrectIndex === j;
     var showResult = selectedIdx !== -1;
-
     var bgStyle, numBg, numColor;
     if(!showResult){
       bgStyle  = "background:#E8ECF0;box-shadow:3px 3px 7px #C8CDD4,-3px -3px 7px #fff";
@@ -600,61 +581,45 @@ function renderPhonePreview(selectedIdx){
       numBg    = "#E8ECF0";
       numColor = "#4A5568";
     }
-
     var checkIcon = showResult && isCorrect  ? "<span style='color:#48BB78;font-size:18px;margin-left:auto'>✓</span>" : "";
     var wrongIcon = showResult && isSelected && !isCorrect ? "<span style='color:#e74c3c;font-size:18px;margin-left:auto'>✗</span>" : "";
-
     html += "<div style='border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;cursor:pointer;"+bgStyle+"' onclick='renderPhonePreview("+j+")'>"+
       "<div style='width:30px;height:30px;border-radius:8px;background:"+numBg+";color:"+numColor+";display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;box-shadow:2px 2px 5px #C8CDD4,-2px -2px 5px #fff'>"+nums[j]+"</div>"+
       "<div style='font-size:13px;color:#4A5568;flex:1;font-family:sans-serif;line-height:1.5'>"+fmtText(opts[j])+"</div>"+
       checkIcon+wrongIcon+
       "</div>";
   }
-
   if(!purpose && !qText && opts.every(function(o){return !o})){
     html = "<div style='color:#8E97A5;font-size:12px;text-align:center;padding:30px 0'>Savol ma'lumotlarini kiriting</div>";
   }
-
   phone.innerHTML = html;
 }
-
 function fmtText(txt){
   if(!txt) return "";
-  // __matn__ → osti chizilgan
   txt = txt.replace(/__([^_]+)__/g, "<u style='color:#5B6EF0'>$1</u>");
-  // _____ → bo'sh joy
   txt = txt.replace(/_{3,}/g, "<u style='color:#5B6EF0;display:inline-block;min-width:60px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>");
-  // / → yangi qator
   txt = txt.replace(/\//g, "<br>");
-  // < > → qoraytirilgan
   txt = txt.replace(/<([^>]+)>/g, "<span style='background:rgba(0,0,0,0.08);border-radius:4px;padding:2px 4px'>$1</span>");
   return txt;
 }
-
-// Modal tashqarisini bossa yopiladi
 document.getElementById("previewModal").addEventListener("click", function(e){
   if(e.target === this) closePreviewModal();
 });
-
 window.addEventListener("DOMContentLoaded",function(){
   buildOptsGrid("optsGrid","","correct");
   buildOptsGrid("g2Grid","g2","g2correct");
-  // Shablonlarni yuklaymiz
   db.collection("audioTemplates").orderBy("createdAt","desc").get().then(function(snap){
     allTemplates=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
     fillAllTplSelects();
   });
 });
 
-
 // ══ TUGMA OVOZI ══
 var currentTapUrl = "";
-
 function showTapName(inp) {
   var el = document.getElementById("tapSoundName");
   if(inp.files[0] && el) el.textContent = "✅ " + inp.files[0].name;
 }
-
 function previewTapSound() {
   var preview = document.getElementById("tapSoundPreview");
   if(!preview) return;
@@ -664,7 +629,6 @@ function previewTapSound() {
     preview.play();
   }
 }
-
 async function saveTapSound() {
   var fileEl = document.getElementById("tapSoundFile");
   var st = document.getElementById("tapSoundStatus");
@@ -686,7 +650,6 @@ async function saveTapSound() {
     st.style.color = "var(--red)";
   }
 }
-
 function loadTapSoundInfo() {
   db.collection("appSettings").doc("sounds").get().then(function(snap) {
     var el = document.getElementById("tapSoundCurrent");
@@ -710,7 +673,6 @@ function showTplName(inp){
     if(el)el.textContent="✅ "+inp.files[0].name;
   }
 }
-
 async function saveTpl(){
   var titleEl=document.getElementById("tplTitle");
   var fileEl=document.getElementById("tplAudioFile");
@@ -739,14 +701,12 @@ async function saveTpl(){
     st.textContent="❌ Xato: "+e.message;st.style.color="var(--red)";
   }
 }
-
 function loadTemplates(){
   var el=document.getElementById("tplList");
   if(!el)return;
   el.innerHTML="<div style='color:var(--muted);font-size:13px'>⏳ Yuklanmoqda...</div>";
   db.collection("audioTemplates").orderBy("createdAt","desc").get().then(function(snap){
     var loaded=snap.docs.map(function(d){var data=d.data();data._id=d.id;return data});
-    // Faqat bo'sh bo'lmasa yangilaymiz
     if(loaded.length>0) allTemplates=loaded;
     fillAllTplSelects();
     if(!allTemplates.length){
@@ -756,11 +716,9 @@ function loadTemplates(){
     renderTplList(el);
   }).catch(function(e){
     el.innerHTML="<div style='color:var(--red);font-size:13px'>❌ Yuklanmadi: "+e.message+"</div>";
-    // Eski ma'lumotlarni ko'rsatamiz
     if(allTemplates.length) renderTplList(el);
   });
 }
-
 function renderTplList(el){
   el.innerHTML=allTemplates.map(function(tpl){
     return "<div class='tpl-item'>"+
@@ -782,9 +740,7 @@ function renderTplList(el){
     });
   });
 }
-
 function fillAllTplSelects(){
-  // value = "id" formatida — URL ni allTemplates dan topamiz
   var opts="<option value=''>— Shablon —</option>"+
     allTemplates.map(function(t){
       var safeTitle=t.title.replace(/'/g,"&#39;");
@@ -795,7 +751,6 @@ function fillAllTplSelects(){
     if(sel){var cur=sel.value;sel.innerHTML=opts;if(cur)sel.value=cur;}
   });
 }
-
 function onPurposeTpl(){
   var sel=document.getElementById("purposeTpl");
   var preview=document.getElementById("purposeTplPreview");
@@ -808,7 +763,6 @@ function onPurposeTpl(){
     }
   } else if(preview){preview.style.display="none";}
 }
-
 function previewTplAudio(previewId){
   var el=document.getElementById(previewId);
   if(el&&el.style.display!=="none"){el.play();}
@@ -845,8 +799,6 @@ function selectSection(btn){
   if(diffCard) diffCard.style.display = isTopik1 ? "none" : "block";
 
   if(isTopik1) populateTopik1Sections();
-});
-  btn.classList.add("active-section");
 }
 function selectType(type,btn){
   selectedTestType=type;
@@ -943,7 +895,6 @@ async function submitQuestion(){
       purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
       purpose:document.getElementById("purposeText").value.trim()||null,
       purposeFontSize:parseInt(document.getElementById("purposeFS").value),
-      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
       questionText:document.getElementById("questionText").value.trim()||null,
       questionFontSize:parseInt(document.getElementById("questionFS").value),
       questionAudioUrl:qaUrl,questionImageUrl:qiUrl,
@@ -980,13 +931,11 @@ async function submitQuestion(){
     }else{
       showStatus("Savol saqlandi! ("+selectedTestType+")","success");
     }
-    // Tozalash
     document.querySelectorAll("#sectionGroup .tog-btn").forEach(function(b){b.classList.remove("active-section");});
     document.querySelectorAll("#diffGroup .tog-btn").forEach(function(b){b.classList.remove("active-ve","active-e","active-m","active-am","active-h");});
     ["purposeText","questionText"].forEach(function(id){document.getElementById(id).value="";});
     document.getElementById("qAudioName").textContent="";
     document.getElementById("qImgPreview").style.display="none";
-    // Barcha file inputlarni tozalaymiz
     var fileInputs=document.querySelectorAll("#optsGrid input[type=file],#pageAdd input[type=file]");
     fileInputs.forEach(function(inp){inp.value="";});
     document.getElementById("qAudioFile").value="";
@@ -997,11 +946,9 @@ async function submitQuestion(){
       var imgPrev=document.getElementById("opt"+k+"ImgPrev");
       if(imgPrev){imgPrev.style.display="none";imgPrev.src="";}
       document.getElementById("vcard"+k).className="vcard";
-      // Shablon selectni ham reset
       var tplSel=document.getElementById("opt"+k+"Tpl");
       if(tplSel)tplSel.value="";
     }
-    // purposeTpl ni reset
     var pTpl=document.getElementById("purposeTpl");
     if(pTpl)pTpl.value="";
     var pPreview=document.getElementById("purposeTplPreview");
@@ -1009,7 +956,6 @@ async function submitQuestion(){
     document.querySelectorAll("input[name='correct']").forEach(function(r){r.checked=false;});
     selectType("Reading",document.getElementById("readingBtn"));
     if(hasGroupQ)toggleGroupBlock();
-    // Grid ni qayta qurish — file inputlar to'liq tozalansin
     buildOptsGrid("optsGrid","","correct");
     buildOptsGrid("g2Grid","g2","g2correct");
     fillAllTplSelects();
@@ -1140,18 +1086,15 @@ function pvDelete(id){
 
 <div id="pageTopik1" style="display:none;max-width:960px;margin:0 auto;padding:28px 20px">
 
-  <!-- Sarlavha -->
   <div style="background:linear-gradient(135deg,#1a1f2e,#1e2330);border:1px solid #2a3045;border-radius:16px;padding:20px 24px;margin-bottom:24px">
     <div style="font-size:18px;font-weight:800;color:#4f8ef7;margin-bottom:4px">📚 TOPIK I — Bo'lim Shablonlari</div>
     <div style="font-size:12px;color:#6b7280;font-family:'IBM Plex Mono',monospace">Har bir bo'lim uchun audio va *보기* rasmini qo'shing. Savol qo'shishda shablon tanlanadi.</div>
   </div>
 
-  <!-- Bo'limlar grid -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px" id="topik1SectionGrid">
     <div style="color:#6b7280;font-size:13px;text-align:center;padding:20px">Yuklanmoqda...</div>
   </div>
 
-  <!-- Shablon qo'shish/tahrirlash -->
   <div id="topik1EditPanel" style="background:var(--surface);border:1.5px solid #4f8ef7;border-radius:16px;padding:24px;display:none;margin-bottom:24px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <div id="topik1EditTitle" style="font-size:15px;font-weight:800;color:#4f8ef7"></div>
@@ -1162,10 +1105,8 @@ function pvDelete(id){
     <input type="hidden" id="t1EditType">
     <input type="hidden" id="t1EditDocId">
 
-    <!-- Bo'lim matni -->
     <div style="background:#1e2330;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#a0aec0;font-family:'IBM Plex Mono',monospace" id="t1SectionText"></div>
 
-    <!-- Bo'lim audiosi -->
     <div style="margin-bottom:16px">
       <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:8px;font-family:'IBM Plex Mono',monospace">🎧 Bo'lim audiosi <span style="color:#6b7280;font-weight:400">(barcha savollar uchun bir marta o'qiladi)</span></div>
       <div id="t1AudioCurrent" style="font-size:12px;color:#6b7280;margin-bottom:8px"></div>
@@ -1180,7 +1121,6 @@ function pvDelete(id){
       <audio id="t1AudioPreview" style="display:none;width:100%;margin-top:8px" controls></audio>
     </div>
 
-    <!-- *보기* rasmi -->
     <div style="margin-bottom:20px">
       <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:8px;font-family:'IBM Plex Mono',monospace">🖼 *보기* rasmi <span style="color:#6b7280;font-weight:400">(ixtiyoriy — foydalanuvchi *보기* bosganida ko'radi)</span></div>
       <div id="t1ImgCurrent" style="margin-bottom:8px"></div>
@@ -1194,7 +1134,6 @@ function pvDelete(id){
       <img id="t1ImgPreview" style="display:none;max-width:280px;max-height:200px;border-radius:10px;margin-top:10px;border:1.5px solid #2a3045" src="">
     </div>
 
-    <!-- Default ball -->
     <div style="margin-bottom:20px">
       <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:8px;font-family:'IBM Plex Mono',monospace">⭐ Standart ball (bu bo'limdagi har bir savol uchun)</div>
       <div style="display:flex;align-items:center;gap:10px">
@@ -1215,7 +1154,7 @@ const TOPIK1_SECTIONS = [{"range": "1~4", "type": "Listening", "text": "다음�
 
 let t1AudioBlob = null;
 let t1ImgBlob = null;
-let t1Templates = {};  // Firebase dan yuklangan
+let t1Templates = {};
 
 async function loadTopik1Templates() {
   const db = firebase.firestore();
@@ -1230,15 +1169,11 @@ async function loadTopik1Templates() {
 function renderTopik1Grid() {
   const grid = document.getElementById("topik1SectionGrid");
   if(!grid) return;
-
-  // Listening va Reading guruhlar
   const listening = TOPIK1_SECTIONS.filter(s => s.type === "Listening");
   const reading   = TOPIK1_SECTIONS.filter(s => s.type === "Reading");
-
   let html = `
     <div style="grid-column:1/-1;font-size:11px;font-weight:800;color:#1565C0;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;padding:4px 0;border-bottom:1.5px solid #1565C0;margin-bottom:4px">🎧 Listening (1~30)</div>
   `;
-
   listening.forEach(sec => {
     const tpl = t1Templates[sec.range];
     const hasAudio = tpl && tpl.sectionAudioUrl;
@@ -1248,7 +1183,7 @@ function renderTopik1Grid() {
       <div style="background:var(--surface);border:1.5px solid ${tpl ? '#4f8ef7' : 'var(--border)'};border-radius:14px;padding:16px;cursor:pointer;transition:all 0.2s"
            onclick="editTopik1Section('${sec.range}')">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-          <div style="font-size:12px;font-weight:800;color:#4f8ef7;font-family:'IBM Plex Mono',monospace">[¡¡${rangeDisplay}]</div>
+          <div style="font-size:12px;font-weight:800;color:#4f8ef7;font-family:'IBM Plex Mono',monospace">[${rangeDisplay}]</div>
           <div style="display:flex;gap:6px">
             ${hasAudio ? '<span style="font-size:10px;background:#1565C020;color:#1565C0;padding:3px 8px;border-radius:20px;font-weight:700">🎧</span>' : '<span style="font-size:10px;background:#2a304550;color:#6b7280;padding:3px 8px;border-radius:20px">🎧</span>'}
             ${hasImg   ? '<span style="font-size:10px;background:#7c5cfc20;color:#7c5cfc;padding:3px 8px;border-radius:20px;font-weight:700">🖼</span>' : '<span style="font-size:10px;background:#2a304550;color:#6b7280;padding:3px 8px;border-radius:20px">🖼</span>'}
@@ -1262,11 +1197,9 @@ function renderTopik1Grid() {
       </div>
     `;
   });
-
   html += `
     <div style="grid-column:1/-1;font-size:11px;font-weight:800;color:#7c5cfc;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;padding:4px 0;border-bottom:1.5px solid #7c5cfc;margin-bottom:4px;margin-top:8px">📖 Reading (31~70)</div>
   `;
-
   reading.forEach(sec => {
     const tpl = t1Templates[sec.range];
     const hasAudio = tpl && tpl.sectionAudioUrl;
@@ -1289,7 +1222,6 @@ function renderTopik1Grid() {
       </div>
     `;
   });
-
   grid.innerHTML = html;
 }
 
@@ -1297,17 +1229,13 @@ function editTopik1Section(range) {
   const sec = TOPIK1_SECTIONS.find(s => s.range === range);
   if(!sec) return;
   const tpl = t1Templates[range] || {};
-
   document.getElementById("t1EditRange").value = range;
   document.getElementById("t1EditType").value = sec.type;
   document.getElementById("t1EditDocId").value = tpl.id || "";
-
   const rangeDisplay = range.replace("22~24A","22~24 (Ayol)").replace("22~24B","22~24 (Erkak)");
   document.getElementById("topik1EditTitle").textContent = `[${rangeDisplay}] — ${sec.type}`;
   document.getElementById("t1SectionText").textContent = sec.text;
   document.getElementById("t1DefaultBall").value = tpl.defaultBall || sec.ball;
-
-  // Audio
   if(tpl.sectionAudioUrl) {
     document.getElementById("t1AudioCurrent").innerHTML = `<a href="${tpl.sectionAudioUrl}" target="_blank" style="color:#4f8ef7;font-size:12px">🎧 Mavjud audio</a>`;
     document.getElementById("t1AudioPlay").style.display = "inline-block";
@@ -1319,14 +1247,11 @@ function editTopik1Section(range) {
     document.getElementById("t1AudioCurrent").textContent = "Audio yuklanmagan";
     document.getElementById("t1AudioPlay").style.display = "none";
   }
-
-  // Rasm
   if(tpl.sectionImageUrl) {
     document.getElementById("t1ImgCurrent").innerHTML = `<img src="${tpl.sectionImageUrl}" style="max-width:200px;border-radius:8px;border:1.5px solid #2a3045">`;
   } else {
     document.getElementById("t1ImgCurrent").innerHTML = "Rasm yuklanmagan";
   }
-
   document.getElementById("t1AudioFile").value = "";
   document.getElementById("t1ImgFile").value = "";
   document.getElementById("t1AudioName").textContent = "";
@@ -1334,7 +1259,6 @@ function editTopik1Section(range) {
   document.getElementById("t1ImgPreview").style.display = "none";
   document.getElementById("t1Status").textContent = "";
   t1AudioBlob = null; t1ImgBlob = null;
-
   document.getElementById("topik1EditPanel").style.display = "block";
   document.getElementById("topik1EditPanel").scrollIntoView({behavior:"smooth"});
 }
@@ -1371,30 +1295,23 @@ async function saveTopik1Template() {
   const ball      = parseFloat(document.getElementById("t1DefaultBall").value) || 2;
   const sec       = TOPIK1_SECTIONS.find(s => s.range === range);
   const status    = document.getElementById("t1Status");
-
   status.style.color = "#f1c40f";
   status.textContent = "⏳ Saqlanmoqda...";
-
   try {
     let audioUrl = t1Templates[range]?.sectionAudioUrl || null;
     let imageUrl = t1Templates[range]?.sectionImageUrl || null;
-
-    // Audio yuklash
     if(t1AudioBlob) {
       status.textContent = "⏳ Audio yuklanmoqda...";
       const sRef = firebase.storage().ref(`topik1/${range}/section_audio.${t1AudioBlob.name.split('.').pop()}`);
       await sRef.put(t1AudioBlob);
       audioUrl = await sRef.getDownloadURL();
     }
-
-    // Rasm yuklash
     if(t1ImgBlob) {
       status.textContent = "⏳ Rasm yuklanmoqda...";
       const iRef = firebase.storage().ref(`topik1/${range}/bogi_image.${t1ImgBlob.name.split('.').pop()}`);
       await iRef.put(t1ImgBlob);
       imageUrl = await iRef.getDownloadURL();
     }
-
     const db = firebase.firestore();
     const data = {
       sectionRange: range,
@@ -1405,18 +1322,15 @@ async function saveTopik1Template() {
       defaultBall: ball,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
-
     if(docId) {
       await db.collection("topik1Templates").doc(docId).update(data);
     } else {
       const ref = await db.collection("topik1Templates").add(data);
       document.getElementById("t1EditDocId").value = ref.id;
     }
-
     status.style.color = "#2ecc71";
     status.textContent = "✅ Saqlandi!";
     await loadTopik1Templates();
-
   } catch(e) {
     status.style.color = "#e74c3c";
     status.textContent = "❌ Xato: " + e.message;
@@ -1424,20 +1338,15 @@ async function saveTopik1Template() {
 }
 </script>
 
-
 <script>
-// ── TOPIK 1 Section selector (savol qo'shish formasi) ──
 async function populateTopik1Sections() {
   const sel = document.getElementById("topik1SectionSelect");
   if(!sel || sel.options.length > 1) return;
   sel.innerHTML = "<option value=''>— Bo'limni tanlang —</option>";
-
   const db = firebase.firestore();
   const snap = await db.collection("topik1Templates").get();
   const tpls = {};
   snap.docs.forEach(doc => { tpls[doc.data().sectionRange] = {id:doc.id, ...doc.data()}; });
-
-  // Barcha bo'limlarni qo'shamiz
   const sections = typeof TOPIK1_SECTIONS !== "undefined" ? TOPIK1_SECTIONS : [];
   sections.forEach(sec => {
     const tpl = tpls[sec.range];
@@ -1460,26 +1369,20 @@ function onTopik1SectionChange(range) {
   const opt = sel.options[sel.selectedIndex];
   const info = document.getElementById("topik1SectionInfo");
   if(!range) { info.style.display = "none"; return; }
-
   info.style.display = "block";
   document.getElementById("topik1SectionText").textContent = opt.dataset.text;
   document.getElementById("topik1SectionAudioStatus").innerHTML =
-    opt.dataset.audioUrl ? '<span style="color:#4f8ef7">🎧 Audio bor</span>' : '<span style="color:#e74c3c">🎧 Audio yo'q</span>';
+    opt.dataset.audioUrl ? '<span style="color:#4f8ef7">🎧 Audio bor</span>' : '<span style="color:#e74c3c">🎧 Audio yo\'q</span>';
   document.getElementById("topik1SectionImgStatus").innerHTML =
-    opt.dataset.imageUrl ? '<span style="color:#7c5cfc">🖼 *보기* rasmi bor</span>' : '<span style="color:#6b7280">🖼 Rasm yo'q</span>';
+    opt.dataset.imageUrl ? '<span style="color:#7c5cfc">🖼 *보기* rasmi bor</span>' : '<span style="color:#6b7280">🖼 Rasm yo\'q</span>';
   document.getElementById("topik1SectionBall").textContent = "⭐ " + opt.dataset.ball + " ball";
-
-  // testType ni avtomatik o'rnatamiz
   if(opt.dataset.type === "Listening") {
     const lb = document.getElementById("listeningBtn");
-    const rb = document.getElementById("readingBtn");
-    if(lb && rb) { selectType("Listening", lb); }
+    if(lb) selectType("Listening", lb);
   } else {
     const rb = document.getElementById("readingBtn");
     if(rb) selectType("Reading", rb);
   }
-
-  // Ball maydonini to'ldiramiz
   const ballInput = document.getElementById("questionBall");
   if(ballInput) ballInput.value = opt.dataset.ball;
 }
