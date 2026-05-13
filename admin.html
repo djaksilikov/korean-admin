@@ -5,30 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Korean Test — Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Sora:wght@400;600;800&display=swap" rel="stylesheet"/>
-<script>
-var pvItems=[];
-function showTab(tab){
-  var a=document.getElementById("pageAdd");
-  var p=document.getElementById("pagePreview");
-  var t=document.getElementById("pageTemplates");
-  var t1=document.getElementById("pageTopik1");
-  var ba=document.getElementById("tabAdd");
-  var bp=document.getElementById("tabPreview");
-  var bt=document.getElementById("tabTemplates");
-  var bt1=document.getElementById("tabTopik1");
-  if(!a||!p)return;
-  a.style.display=tab==="add"?"block":"none";
-  p.style.display=tab==="preview"?"block":"none";
-  if(t)t.style.display=tab==="templates"?"block":"none";
-  if(t1)t1.style.display=tab==="topik1"?"block":"none";
-  [ba,bp,bt,bt1].forEach(function(b){if(b){b.style.background="transparent";b.style.border="1.5px solid #2a3045";b.style.color="#6b7280";}});
-  var active=tab==="add"?ba:tab==="preview"?bp:tab==="topik1"?bt1:bt;
-  if(active){active.style.background="linear-gradient(135deg,#4f8ef7,#7c5cfc)";active.style.border="none";active.style.color="#fff";}
-  if(tab==="preview"&&typeof pvLoad==="function"&&pvItems.length===0)pvLoad();
-  if(tab==="templates"&&typeof loadTemplates==="function")loadTemplates();
-  if(tab==="topik1"&&typeof loadTopik1Templates==="function")loadTopik1Templates();
-}
-</script>
+
 <style>
 :root{--bg:#0d0f14;--surface:#161a23;--surface2:#1e2330;--border:#2a3045;--accent:#4f8ef7;--accent2:#7c5cfc;--green:#2ecc71;--red:#e74c3c;--yellow:#f1c40f;--text:#e8eaf0;--muted:#6b7280;--radius:10px}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -217,26 +194,60 @@ select:focus{border-color:var(--accent)}
     </div>
   </div>
 
-  <!-- TOPIK 1 uchun bo'lim (shablon) tanlash -->
+  <!-- TOPIK 1 uchun bo'lim tanlash (qiyinlik o'rnida) -->
   <div class="card" id="topik1SectionCard" style="display:none">
     <div class="card-header">
-      <div class="step" style="background:linear-gradient(135deg,#1565C0,#7c5cfc)">§</div>
-      <h2>Bo'lim tanlash (TOPIK 1)</h2>
+      <div class="step" style="background:linear-gradient(135deg,#1565C0,#7c5cfc)">3</div>
+      <h2>Bo'lim tanlash</h2>
       <span class="badge-req">majburiy</span>
     </div>
     <div class="card-body">
-      <p class="hint" style="margin-bottom:14px">📌 Savol qaysi bo'limga tegishli ekanligini tanlang. Bo'lim matni, audiosi va *보기* rasmi shablon orqali biriktiriladi.</p>
-      <select id="topik1SectionSelect" onchange="onTopik1SectionChange(this.value)"
-        style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-family:'Sora',sans-serif;cursor:pointer">
-        <option value="">— Bo'limni tanlang —</option>
-      </select>
+      <p class="hint" style="margin-bottom:14px">📌 Savol qaysi bo'limga tegishli ekanligini tanlang.</p>
+
+      <!-- Listening bo'limlari -->
+      <div style="font-size:10px;font-weight:800;color:#1565C0;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:8px;border-bottom:1.5px solid #1565C030;padding-bottom:4px">🎧 Listening (1~30)</div>
+      <div class="btn-group" style="flex-wrap:wrap;gap:7px;margin-bottom:14px" id="t1ListeningBtns">
+        <button class="tog-btn" data-range="1~4"   data-type="Listening" data-ball="2" onclick="selectTopik1Section(this)">[1~4]</button>
+        <button class="tog-btn" data-range="5~6"   data-type="Listening" data-ball="2" onclick="selectTopik1Section(this)">[5~6]</button>
+        <button class="tog-btn" data-range="7~10"  data-type="Listening" data-ball="2" onclick="selectTopik1Section(this)">[7~10]</button>
+        <button class="tog-btn" data-range="11~14" data-type="Listening" data-ball="2" onclick="selectTopik1Section(this)">[11~14]</button>
+        <button class="tog-btn" data-range="15~16" data-type="Listening" data-ball="3" onclick="selectTopik1Section(this)">[15~16]</button>
+        <button class="tog-btn" data-range="17~21" data-type="Listening" data-ball="3" onclick="selectTopik1Section(this)">[17~21]</button>
+        <button class="tog-btn" data-range="22~24A" data-type="Listening" data-ball="3" onclick="selectTopik1Section(this)">[22~24 Ayol]</button>
+        <button class="tog-btn" data-range="22~24B" data-type="Listening" data-ball="3" onclick="selectTopik1Section(this)">[22~24 Erkak]</button>
+        <button class="tog-btn" data-range="25~26" data-type="Listening" data-ball="3" onclick="selectTopik1Section(this)">[25~26]</button>
+        <button class="tog-btn" data-range="27~28" data-type="Listening" data-ball="3" onclick="selectTopik1Section(this)">[27~28]</button>
+        <button class="tog-btn" data-range="29~30" data-type="Listening" data-ball="3" onclick="selectTopik1Section(this)">[29~30]</button>
+      </div>
+
+      <!-- Reading bo'limlari -->
+      <div style="font-size:10px;font-weight:800;color:#7c5cfc;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:8px;border-bottom:1.5px solid #7c5cfc30;padding-bottom:4px">📖 Reading (31~70)</div>
+      <div class="btn-group" style="flex-wrap:wrap;gap:7px" id="t1ReadingBtns">
+        <button class="tog-btn" data-range="31~33" data-type="Reading" data-ball="2" onclick="selectTopik1Section(this)">[31~33]</button>
+        <button class="tog-btn" data-range="34~39" data-type="Reading" data-ball="2" onclick="selectTopik1Section(this)">[34~39]</button>
+        <button class="tog-btn" data-range="40~42" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[40~42]</button>
+        <button class="tog-btn" data-range="43~45" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[43~45]</button>
+        <button class="tog-btn" data-range="46~48" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[46~48]</button>
+        <button class="tog-btn" data-range="49~50" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[49~50]</button>
+        <button class="tog-btn" data-range="51~52" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[51~52]</button>
+        <button class="tog-btn" data-range="53~54" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[53~54]</button>
+        <button class="tog-btn" data-range="55~56" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[55~56]</button>
+        <button class="tog-btn" data-range="57~58" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[57~58]</button>
+        <button class="tog-btn" data-range="59~60" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[59~60]</button>
+        <button class="tog-btn" data-range="61~62" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[61~62]</button>
+        <button class="tog-btn" data-range="63~64" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[63~64]</button>
+        <button class="tog-btn" data-range="65~66" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[65~66]</button>
+        <button class="tog-btn" data-range="67~68" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[67~68]</button>
+        <button class="tog-btn" data-range="69~70" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[69~70]</button>
+      </div>
+
       <!-- Tanlangan bo'lim ma'lumoti -->
-      <div id="topik1SectionInfo" style="display:none;margin-top:14px;background:#1e2330;border-radius:10px;padding:14px 16px">
-        <div id="topik1SectionText" style="font-size:12px;color:#a0aec0;font-family:'IBM Plex Mono',monospace;margin-bottom:10px"></div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div id="topik1SectionInfo" style="display:none;margin-top:16px;background:#1e2330;border-radius:12px;padding:14px 16px;border:1.5px solid #2a3045">
+        <div id="topik1SectionText" style="font-size:12px;color:#a0aec0;font-family:'IBM Plex Mono',monospace;margin-bottom:10px;line-height:1.6"></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
           <div id="topik1SectionAudioStatus" style="font-size:11px"></div>
           <div id="topik1SectionImgStatus" style="font-size:11px"></div>
-          <div id="topik1SectionBall" style="font-size:11px;color:#e67e22"></div>
+          <div id="topik1SectionBall" style="font-size:11px;color:#e67e22;font-weight:700"></div>
         </div>
       </div>
     </div>
@@ -845,7 +856,7 @@ function selectSection(btn){
   if(diffCard)   diffCard.style.display   = isTopik1 ? "none"  : "block";
 
   if(isTopik1) {
-    if(typeof populateTopik1Sections === "function") populateTopik1Sections();
+    if(typeof loadT1TemplatesForForm === "function") loadT1TemplatesForForm();
   }
 
   // Ball kartasini ham ko'rsatamiz
@@ -1226,7 +1237,7 @@ async function loadTopik1Templates() {
   try {
     const snap = await db.collection("topik1Templates").get();
     t1Templates = {};
-    snap.docs.forEach(doc => { t1Templates[doc.data().sectionRange] = {id: doc.id, ...doc.data()}; });
+    snap.docs.forEach(doc => { t1Templates[doc.data().sectionRange] = Object.assign({id:doc.id}, doc.data()); });
   } catch(e) { console.log(e); }
   renderTopik1Grid();
 }
@@ -1439,7 +1450,7 @@ async function populateTopik1Sections() {
   const db = firebase.firestore();
   const snap = await db.collection("topik1Templates").get();
   const tpls = {};
-  snap.docs.forEach(doc => { tpls[doc.data().sectionRange] = {id:doc.id, ...doc.data()}; });
+  snap.docs.forEach(doc => { tpls[doc.data().sectionRange] = Object.assign({id:doc.id}, doc.data()); });
 
   // Barcha bo'limlarni qo'shamiz
   const sections = typeof TOPIK1_SECTIONS !== "undefined" ? TOPIK1_SECTIONS : [];
@@ -1468,9 +1479,9 @@ function onTopik1SectionChange(range) {
   info.style.display = "block";
   document.getElementById("topik1SectionText").textContent = opt.dataset.text;
   document.getElementById("topik1SectionAudioStatus").innerHTML =
-    opt.dataset.audioUrl ? '<span style="color:#4f8ef7">🎧 Audio bor</span>' : '<span style="color:#e74c3c">🎧 Audio yo'q</span>';
+    opt.dataset.audioUrl ? '<span style="color:#4f8ef7">🎧 Audio bor</span>' : "<span style='color:#e74c3c'>🎧 Audio yo&#39;q</span>";
   document.getElementById("topik1SectionImgStatus").innerHTML =
-    opt.dataset.imageUrl ? '<span style="color:#7c5cfc">🖼 *보기* rasmi bor</span>' : '<span style="color:#6b7280">🖼 Rasm yo'q</span>';
+    opt.dataset.imageUrl ? '<span style="color:#7c5cfc">🖼 *보기* rasmi bor</span>' : "<span style='color:#6b7280'>🖼 Rasm yo\u0027q</span>";
   document.getElementById("topik1SectionBall").textContent = "⭐ " + opt.dataset.ball + " ball";
 
   // testType ni avtomatik o'rnatamiz
@@ -1486,6 +1497,118 @@ function onTopik1SectionChange(range) {
   // Ball maydonini to'ldiramiz
   const ballInput = document.getElementById("questionBall");
   if(ballInput) ballInput.value = opt.dataset.ball;
+}
+</script>
+
+<script>
+// ── TOPIK 1 bo'lim tanlash (savol qo'shish formasida) ──
+var TOPIK1_TEXT = {"1~4": "다음을 듣고 *보기*와 같이 물음에 맞는 대답을 고르십시오.", "5~6": "다음을 듣고 *보기*와 같이 이어지는 말을 고르십시오.", "7~10": "여기는 어디입니까? *보기*와 같이 알맞은 것을 고르십시오.", "11~14": "다음은 무엇에 대해 말하고 있습니까? *보기*와 같이 알맞은 것을 고르십시오.", "15~16": "다음을 듣고 가장 알맞은 그림을 고르십시오.", "17~21": "다음을 듣고 *보기*와 같이 대화 내용과 같은 것을 고르십시오.", "22~24A": "다음을 듣고 여자의 중심 생각을 고르십시오.", "22~24B": "다음을 듣고 남자의 중심 생각을 고르십시오.", "25~26": "다음을 듣고 물음에 답하십시오. (25~26)", "27~28": "다음을 듣고 물음에 답하십시오. (27~28)", "29~30": "다음을 듣고 물음에 답하십시오. (29~30)", "31~33": "무엇에 대한 내용입니까? *보기*와 같이 알맞은 것을 고르십시오.", "34~39": "*보기*와 같이 (　　)에 들어갈 말로 가장 알맞은 것을 고르십시오.", "40~42": "다음을 읽고 맞지 않는 것을 고르십시오.", "43~45": "다음을 읽고 내용이 같은 것을 고르십시오.", "46~48": "다음을 읽고 중심 내용을 고르십시오.", "49~50": "다음을 읽고 물음에 답하십시오. (49~50)", "51~52": "다음을 읽고 물음에 답하십시오. (51~52)", "53~54": "다음을 읽고 물음에 답하십시오. (53~54)", "55~56": "다음을 읽고 물음에 답하십시오. (55~56)", "57~58": "다음을 순서에 맞게 배열한 것을 고르십시오.", "59~60": "다음을 읽고 물음에 답하십시오. (59~60)", "61~62": "다음을 읽고 물음에 답하십시오. (61~62)", "63~64": "다음을 읽고 물음에 답하십시오. (63~64)", "65~66": "다음을 읽고 물음에 답하십시오. (65~66)", "67~68": "다음을 읽고 물음에 답하십시오. (67~68)", "69~70": "다음을 읽고 물음에 답하십시오. (69~70)"};
+var selectedT1Range = "";
+var t1Templates = {};
+
+async function loadT1TemplatesForForm() {
+  if(Object.keys(t1Templates).length > 0) return;
+  try {
+    var snap = await firebase.firestore().collection("topik1Templates").get();
+    snap.docs.forEach(function(doc) {
+      var d = doc.data();
+      d.id = doc.id;
+      t1Templates[d.sectionRange] = d;
+    });
+  } catch(e) { console.log(e); }
+}
+
+function selectTopik1Section(btn) {
+  // Hammasi faolsizlanadi
+  document.querySelectorAll("#t1ListeningBtns .tog-btn, #t1ReadingBtns .tog-btn").forEach(function(b) {
+    b.className = "tog-btn";
+  });
+  
+  var range = btn.dataset.range;
+  var type  = btn.dataset.type;
+  var ball  = btn.dataset.ball;
+  selectedT1Range = range;
+  
+  // Aktiv qilamiz
+  if(type === "Listening") {
+    btn.style.background = "#1565C0";
+    btn.style.color = "#fff";
+    btn.style.borderColor = "transparent";
+  } else {
+    btn.style.background = "#7c5cfc";
+    btn.style.color = "#fff";
+    btn.style.borderColor = "transparent";
+  }
+  
+  // testType avtomatik
+  if(type === "Listening") {
+    var lb = document.getElementById("listeningBtn");
+    if(lb) selectType("Listening", lb);
+  } else {
+    var rb = document.getElementById("readingBtn");
+    if(rb) selectType("Reading", rb);
+  }
+  
+  // Ball
+  var ballInput = document.getElementById("questionBall");
+  if(ballInput) ballInput.value = ball;
+  
+  // Bo'lim ma'lumoti
+  var info = document.getElementById("topik1SectionInfo");
+  var textEl = document.getElementById("topik1SectionText");
+  var audioEl = document.getElementById("topik1SectionAudioStatus");
+  var imgEl   = document.getElementById("topik1SectionImgStatus");
+  var ballEl  = document.getElementById("topik1SectionBall");
+  
+  if(info) info.style.display = "block";
+  if(textEl) textEl.textContent = TOPIK1_TEXT[range] || "";
+  
+  // Shablon ma'lumoti
+  var tpl = t1Templates[range];
+  if(audioEl) audioEl.innerHTML = tpl && tpl.sectionAudioUrl
+    ? '<span style="color:#4f8ef7;font-weight:700">🎧 Audio bor</span>'
+    : '<span style="color:#e74c3c">🎧 Audio yuklanmagan</span>';
+  if(imgEl) imgEl.innerHTML = tpl && tpl.sectionImageUrl
+    ? '<span style="color:#7c5cfc;font-weight:700">🖼 *보기* rasmi bor</span>'
+    : "<span style='color:#6b7280'>🖼 Rasm yo\u0027q</span>";
+  if(ballEl) ballEl.textContent = "⭐ " + (tpl && tpl.defaultBall ? tpl.defaultBall : ball) + " ball";
+  if(ballInput && tpl && tpl.defaultBall) ballInput.value = tpl.defaultBall;
+  
+  // Firebase dan yangi yuklash
+  loadT1TemplatesForForm().then(function() {
+    var tpl2 = t1Templates[range];
+    if(audioEl) audioEl.innerHTML = tpl2 && tpl2.sectionAudioUrl
+      ? '<span style="color:#4f8ef7;font-weight:700">🎧 Audio bor</span>'
+      : '<span style="color:#e74c3c">🎧 Audio yuklanmagan</span>';
+    if(imgEl) imgEl.innerHTML = tpl2 && tpl2.sectionImageUrl
+      ? '<span style="color:#7c5cfc;font-weight:700">🖼 *보기* rasmi bor</span>'
+      : "<span style='color:#6b7280'>🖼 Rasm yo\u0027q</span>";
+  });
+}
+</script>
+
+<script>
+var pvItems=[];
+function showTab(tab){
+  var a=document.getElementById("pageAdd");
+  var p=document.getElementById("pagePreview");
+  var t=document.getElementById("pageTemplates");
+  var t1=document.getElementById("pageTopik1");
+  var ba=document.getElementById("tabAdd");
+  var bp=document.getElementById("tabPreview");
+  var bt=document.getElementById("tabTemplates");
+  var bt1=document.getElementById("tabTopik1");
+  if(!a||!p)return;
+  a.style.display=tab==="add"?"block":"none";
+  p.style.display=tab==="preview"?"block":"none";
+  if(t)t.style.display=tab==="templates"?"block":"none";
+  if(t1)t1.style.display=tab==="topik1"?"block":"none";
+  [ba,bp,bt,bt1].forEach(function(b){if(b){b.style.background="transparent";b.style.border="1.5px solid #2a3045";b.style.color="#6b7280";}});
+  var active=tab==="add"?ba:tab==="preview"?bp:tab==="topik1"?bt1:bt;
+  if(active){active.style.background="linear-gradient(135deg,#4f8ef7,#7c5cfc)";active.style.border="none";active.style.color="#fff";}
+  if(tab==="preview"&&typeof pvLoad==="function"&&pvItems.length===0)pvLoad();
+  if(tab==="templates"&&typeof loadTemplates==="function")loadTemplates();
+  if(tab==="topik1"&&typeof loadTopik1Templates==="function")loadTopik1Templates();
 }
 </script>
 </body>
