@@ -1314,7 +1314,6 @@ function editTopik1Section(range) {
   const rangeDisplay = range.replace("22~24A","22~24 (Ayol)").replace("22~24B","22~24 (Erkak)");
   document.getElementById("topik1EditTitle").textContent = `[${rangeDisplay}] — ${sec.type}`;
   document.getElementById("t1SectionText").textContent = sec.text;
-  document.getElementById("t1DefaultBall").value = tpl.defaultBall || sec.ball;
 
   // Audio
   if(tpl.sectionAudioUrl) {
@@ -1377,7 +1376,6 @@ async function saveTopik1Template() {
   const range     = document.getElementById("t1EditRange").value;
   const type      = document.getElementById("t1EditType").value;
   const docId     = document.getElementById("t1EditDocId").value;
-  const ball      = parseFloat(document.getElementById("t1DefaultBall").value) || 2;
   const sec       = TOPIK1_SECTIONS.find(s => s.range === range);
   const status    = document.getElementById("t1Status");
 
@@ -1385,13 +1383,14 @@ async function saveTopik1Template() {
   status.textContent = "⏳ Saqlanmoqda...";
 
   try {
-    let audioUrl = t1Templates[range]?.sectionAudioUrl || null;
-    let imageUrl = t1Templates[range]?.sectionImageUrl || null;
+    var tplData = t1Templates[range] || {};
+    var audioUrl = tplData.sectionAudioUrl || null;
+    var imageUrl = tplData.sectionImageUrl || null;
 
     // Audio yuklash
     if(t1AudioBlob) {
       status.textContent = "⏳ Audio yuklanmoqda...";
-      const sRef = firebase.storage().ref(`topik1/${range}/section_audio.${t1AudioBlob.name.split('.').pop()}`);
+      var sRef = storage.ref(`topik1/${range}/section_audio.${t1AudioBlob.name.split('.').pop()}`);
       await sRef.put(t1AudioBlob);
       audioUrl = await sRef.getDownloadURL();
     }
@@ -1399,7 +1398,7 @@ async function saveTopik1Template() {
     // Rasm yuklash
     if(t1ImgBlob) {
       status.textContent = "⏳ Rasm yuklanmoqda...";
-      const iRef = firebase.storage().ref(`topik1/${range}/bogi_image.${t1ImgBlob.name.split('.').pop()}`);
+      var iRef = storage.ref(`topik1/${range}/bogi_image.${t1ImgBlob.name.split('.').pop()}`);
       await iRef.put(t1ImgBlob);
       imageUrl = await iRef.getDownloadURL();
     }
