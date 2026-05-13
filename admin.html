@@ -1469,6 +1469,15 @@ function selectTopik1Section(btn) {
   var ball  = btn.dataset.ball;
   selectedT1Range = range;
   
+  // Savol maqsadi — bo'lim matnini avtomatik to'ldiramiz
+  var sectionText = TOPIK1_TEXT[range] || "";
+  var purposeEl = document.getElementById("purposeText");
+  if(purposeEl) purposeEl.value = sectionText;
+  
+  // purposeTpl ni tozalaymiz (TOPIK 1 da audio shablon yo'q)
+  var purposeTpl = document.getElementById("purposeTpl");
+  if(purposeTpl) purposeTpl.value = "";
+  
   // Aktiv qilamiz
   if(type === "Listening") {
     btn.style.background = "#1565C0";
