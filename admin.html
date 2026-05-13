@@ -927,7 +927,6 @@ async function submitQuestion(){
   var diff=document.querySelector("#diffGroup .tog-btn[class*='active-ve'],#diffGroup .tog-btn[class*='active-e'],#diffGroup .tog-btn[class*='active-m'],#diffGroup .tog-btn[class*='active-am'],#diffGroup .tog-btn[class*='active-h']");
   var cor=document.querySelector("input[name='correct']:checked");
   if(!section){showStatus("Bo'lim tanlang!","error");return;}
-  if(!diff){showStatus("Qiyinlik tanlang!","error");return;}
   if(!cor){showStatus("To'g'ri javobni belgilang!","error");return;}
   if(hasGroupQ&&!document.querySelector("input[name='g2correct']:checked")){showStatus("2-savol to'g'ri javobni belgilang!","error");return;}
   btn.disabled=true;btn.textContent="Yuklanmoqda...";
@@ -955,16 +954,22 @@ async function submitQuestion(){
     }
     var purposeTplSel=document.getElementById("purposeTpl");
     var q1={
-      section:section.dataset.val,testType:selectedTestType,difficulty:diff.dataset.val,
-      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
-      purpose:document.getElementById("purposeText").value.trim()||null,
-      purposeFontSize:parseInt(document.getElementById("purposeFS").value),
-      purposeTemplateId:purposeTplSel&&purposeTplSel.value?purposeTplSel.value:null,
-      questionText:document.getElementById("questionText").value.trim()||null,
-      questionFontSize:parseInt(document.getElementById("questionFS").value),
-      questionAudioUrl:qaUrl,questionImageUrl:qiUrl,
-      options:opts1,correctIndex:parseInt(cor.value),
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      section: section.dataset.val,
+      testType: selectedTestType,
+      difficulty: isTopik1 ? null : (diff ? diff.dataset.val : null),
+      topik1Range: isTopik1 ? (selectedT1Range || null) : null,
+      topik1TemplateId: isTopik1 ? (t1Templates[selectedT1Range] && t1Templates[selectedT1Range].id ? t1Templates[selectedT1Range].id : null) : null,
+      ball: isTopik1 ? (parseFloat(document.getElementById("questionBall").value) || null) : null,
+      purposeTemplateId: purposeTplSel && purposeTplSel.value ? purposeTplSel.value : null,
+      purpose: document.getElementById("purposeText").value.trim() || null,
+      purposeFontSize: parseInt(document.getElementById("purposeFS").value),
+      questionText: document.getElementById("questionText").value.trim() || null,
+      questionFontSize: parseInt(document.getElementById("questionFS").value),
+      questionAudioUrl: qaUrl,
+      questionImageUrl: qiUrl,
+      options: opts1,
+      correctIndex: parseInt(cor.value),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     if(gId){q1.groupId=gId;q1.groupOrder=1;}
     await db.collection("questions").add(q1);
