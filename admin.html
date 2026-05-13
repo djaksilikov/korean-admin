@@ -926,7 +926,10 @@ async function submitQuestion(){
   var section=document.querySelector("#sectionGroup .tog-btn.active-section");
   var diff=document.querySelector("#diffGroup .tog-btn[class*='active-ve'],#diffGroup .tog-btn[class*='active-e'],#diffGroup .tog-btn[class*='active-m'],#diffGroup .tog-btn[class*='active-am'],#diffGroup .tog-btn[class*='active-h']");
   var cor=document.querySelector("input[name='correct']:checked");
+  var isTopik1 = section && section.dataset.val === "TOPIK 1";
   if(!section){showStatus("Bo'lim tanlang!","error");return;}
+  if(!isTopik1 && !diff){showStatus("Qiyinlik tanlang!","error");return;}
+  if(isTopik1 && !selectedT1Range){showStatus("Bo'lim tanlang! [1~4], [5~6]...","error");return;}
   if(!cor){showStatus("To'g'ri javobni belgilang!","error");return;}
   if(hasGroupQ&&!document.querySelector("input[name='g2correct']:checked")){showStatus("2-savol to'g'ri javobni belgilang!","error");return;}
   btn.disabled=true;btn.textContent="Yuklanmoqda...";
