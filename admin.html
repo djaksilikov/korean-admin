@@ -1210,14 +1210,7 @@ function pvDelete(id){
       <img id="t1ImgPreview" style="display:none;max-width:280px;max-height:200px;border-radius:10px;margin-top:10px;border:1.5px solid #2a3045" src="">
     </div>
 
-    <!-- Default ball -->
-    <div style="margin-bottom:20px">
-      <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:8px;font-family:'IBM Plex Mono',monospace">⭐ Standart ball (bu bo'limdagi har bir savol uchun)</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <input type="number" id="t1DefaultBall" min="1" max="10" step="0.5" style="width:100px;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:15px;font-weight:700;font-family:'Sora',sans-serif">
-        <span style="font-size:13px;color:var(--muted)">ball</span>
-      </div>
-    </div>
+
 
     <div id="t1Status" style="font-size:13px;margin-bottom:12px;min-height:18px"></div>
     <button onclick="saveTopik1Template()" style="padding:12px 32px;border-radius:12px;border:none;background:linear-gradient(135deg,#4f8ef7,#7c5cfc);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">💾 Saqlash</button>
@@ -1418,7 +1411,6 @@ async function saveTopik1Template() {
       sectionText: sec.text,
       sectionAudioUrl: audioUrl,
       sectionImageUrl: imageUrl,
-      defaultBall: ball,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
@@ -1441,72 +1433,12 @@ async function saveTopik1Template() {
 </script>
 
 
-<script>
-// ── TOPIK 1 Section selector (savol qo'shish formasi) ──
-async function populateTopik1Sections() {
-  const sel = document.getElementById("topik1SectionSelect");
-  if(!sel || sel.options.length > 1) return;
-  sel.innerHTML = "<option value=''>— Bo'limni tanlang —</option>";
 
-  const db = firebase.firestore();
-  const snap = await db.collection("topik1Templates").get();
-  const tpls = {};
-  snap.docs.forEach(doc => { tpls[doc.data().sectionRange] = Object.assign({id:doc.id}, doc.data()); });
-
-  // Barcha bo'limlarni qo'shamiz
-  const sections = typeof TOPIK1_SECTIONS !== "undefined" ? TOPIK1_SECTIONS : [];
-  sections.forEach(sec => {
-    const tpl = tpls[sec.range];
-    const rangeDisplay = sec.range.replace("22~24A","22~24 (Ayol)").replace("22~24B","22~24 (Erkak)");
-    const opt = document.createElement("option");
-    opt.value = sec.range;
-    opt.textContent = "[" + rangeDisplay + "] " + sec.text.substring(0,40) + "...";
-    opt.dataset.tplId = tpl ? tpl.id : "";
-    opt.dataset.audioUrl = tpl ? (tpl.sectionAudioUrl||"") : "";
-    opt.dataset.imageUrl = tpl ? (tpl.sectionImageUrl||"") : "";
-    opt.dataset.ball = tpl ? (tpl.defaultBall||sec.ball) : sec.ball;
-    opt.dataset.text = sec.text;
-    opt.dataset.type = sec.type;
-    sel.appendChild(opt);
-  });
-}
-
-function onTopik1SectionChange(range) {
-  const sel = document.getElementById("topik1SectionSelect");
-  const opt = sel.options[sel.selectedIndex];
-  const info = document.getElementById("topik1SectionInfo");
-  if(!range) { info.style.display = "none"; return; }
-
-  info.style.display = "block";
-  document.getElementById("topik1SectionText").textContent = opt.dataset.text;
-  document.getElementById("topik1SectionAudioStatus").innerHTML =
-    opt.dataset.audioUrl ? '<span style="color:#4f8ef7">🎧 Audio bor</span>' : "<span style='color:#e74c3c'>🎧 Audio yo&#39;q</span>";
-  document.getElementById("topik1SectionImgStatus").innerHTML =
-    opt.dataset.imageUrl ? '<span style="color:#7c5cfc">🖼 *보기* rasmi bor</span>' : "<span style='color:#6b7280'>🖼 Rasm yo\u0027q</span>";
-  document.getElementById("topik1SectionBall").textContent = "⭐ " + opt.dataset.ball + " ball";
-
-  // testType ni avtomatik o'rnatamiz
-  if(opt.dataset.type === "Listening") {
-    const lb = document.getElementById("listeningBtn");
-    const rb = document.getElementById("readingBtn");
-    if(lb && rb) { selectType("Listening", lb); }
-  } else {
-    const rb = document.getElementById("readingBtn");
-    if(rb) selectType("Reading", rb);
-  }
-
-  // Ball maydonini to'ldiramiz
-  const ballInput = document.getElementById("questionBall");
-  if(ballInput) ballInput.value = opt.dataset.ball;
-}
-</script>
 
 <script>
 // ── TOPIK 1 bo'lim tanlash (savol qo'shish formasida) ──
 var TOPIK1_TEXT = {"1~4": "다음을 듣고 *보기*와 같이 물음에 맞는 대답을 고르십시오.", "5~6": "다음을 듣고 *보기*와 같이 이어지는 말을 고르십시오.", "7~10": "여기는 어디입니까? *보기*와 같이 알맞은 것을 고르십시오.", "11~14": "다음은 무엇에 대해 말하고 있습니까? *보기*와 같이 알맞은 것을 고르십시오.", "15~16": "다음을 듣고 가장 알맞은 그림을 고르십시오.", "17~21": "다음을 듣고 *보기*와 같이 대화 내용과 같은 것을 고르십시오.", "22~24A": "다음을 듣고 여자의 중심 생각을 고르십시오.", "22~24B": "다음을 듣고 남자의 중심 생각을 고르십시오.", "25~26": "다음을 듣고 물음에 답하십시오. (25~26)", "27~28": "다음을 듣고 물음에 답하십시오. (27~28)", "29~30": "다음을 듣고 물음에 답하십시오. (29~30)", "31~33": "무엇에 대한 내용입니까? *보기*와 같이 알맞은 것을 고르십시오.", "34~39": "*보기*와 같이 (　　)에 들어갈 말로 가장 알맞은 것을 고르십시오.", "40~42": "다음을 읽고 맞지 않는 것을 고르십시오.", "43~45": "다음을 읽고 내용이 같은 것을 고르십시오.", "46~48": "다음을 읽고 중심 내용을 고르십시오.", "49~50": "다음을 읽고 물음에 답하십시오. (49~50)", "51~52": "다음을 읽고 물음에 답하십시오. (51~52)", "53~54": "다음을 읽고 물음에 답하십시오. (53~54)", "55~56": "다음을 읽고 물음에 답하십시오. (55~56)", "57~58": "다음을 순서에 맞게 배열한 것을 고르십시오.", "59~60": "다음을 읽고 물음에 답하십시오. (59~60)", "61~62": "다음을 읽고 물음에 답하십시오. (61~62)", "63~64": "다음을 읽고 물음에 답하십시오. (63~64)", "65~66": "다음을 읽고 물음에 답하십시오. (65~66)", "67~68": "다음을 읽고 물음에 답하십시오. (67~68)", "69~70": "다음을 읽고 물음에 답하십시오. (69~70)"};
 var selectedT1Range = "";
-var t1Templates = {};
-
 async function loadT1TemplatesForForm() {
   if(Object.keys(t1Templates).length > 0) return;
   try {
