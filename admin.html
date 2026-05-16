@@ -242,13 +242,58 @@ select:focus{border-color:var(--accent)}
         <button class="tog-btn" data-range="69~70" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[69~70]</button>
       </div>
 
-      <!-- Guruh savol (25-26 kabi) -->
-      <div id="topik1MultiDiv" style="display:none;margin-top:12px;padding:10px 14px;background:#1e2a1e;border-radius:10px;border:1.5px solid #27ae60">
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#2ecc71;font-weight:700">
-          <input type="checkbox" id="topik1IsMulti" style="width:16px;height:16px;cursor:pointer">
-          Guruh savol (25-26, 27-28 kabi) — bitta ekranda 2 savol
+      <!-- Guruh savol (25-26 kabi) — ikkala savol birga qo'shiladi -->
+      <div id="topik1MultiDiv" style="display:none;margin-top:12px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#2ecc71;font-weight:700;margin-bottom:10px"
+               onclick="toggleTopik1Multi()">
+          <div id="topik1MultiCheck" style="width:18px;height:18px;border:2px solid #27ae60;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all 0.2s">
+            <span id="topik1MultiCheckIcon" style="display:none;color:#2ecc71;font-size:14px">✓</span>
+          </div>
+          Guruh savol — bitta ekranda 2 savol birga
         </label>
-        <p style="font-size:11px;color:#6b7280;margin:6px 0 0 26px">Bu savolni qo'shgach, keyingi savolni ham xuddi shu groupId bilan qo'shing</p>
+
+        <!-- 2-savol maydoni -->
+        <div id="topik1Q2Panel" style="display:none;background:#1e2330;border-radius:14px;padding:16px;border:1.5px solid #27ae60;margin-top:8px">
+          <div style="font-size:12px;font-weight:800;color:#2ecc71;margin-bottom:14px;font-family:'IBM Plex Mono',monospace">
+            📝 2-SAVOL (26, 28, 30... raqamdagi)
+          </div>
+
+          <!-- 2-savol matni -->
+          <div class="field" style="margin-bottom:10px">
+            <label style="font-size:10px;color:#6b7280;font-family:'IBM Plex Mono',monospace">SAVOL MATNI</label>
+            <textarea id="q2Text" rows="2" placeholder="2-savol matni..." style="width:100%;padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px;resize:vertical;font-family:'Sora',sans-serif;margin-top:4px"></textarea>
+          </div>
+
+          <!-- 2-savol audio -->
+          <div style="margin-bottom:10px">
+            <label style="font-size:10px;color:#6b7280;font-family:'IBM Plex Mono',monospace">AUDIO</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+              <label class="upload-btn" style="font-size:12px;padding:6px 12px">🎧 Audio<input type="file" id="q2AudioFile" accept="audio/*" onchange="showQ2FileName(this,'q2AudioName')"></label>
+              <span id="q2AudioName" style="font-size:11px;color:var(--muted)"></span>
+            </div>
+          </div>
+
+          <!-- 2-savol rasm -->
+          <div style="margin-bottom:12px">
+            <label style="font-size:10px;color:#6b7280;font-family:'IBM Plex Mono',monospace">RASM</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+              <label class="upload-btn" style="font-size:12px;padding:6px 12px">🖼 Rasm<input type="file" id="q2ImgFile" accept="image/*" onchange="showQ2ImgPreview(this)"></label>
+              <span id="q2ImgName" style="font-size:11px;color:var(--muted)"></span>
+            </div>
+            <img id="q2ImgPreview" style="display:none;max-width:200px;border-radius:8px;margin-top:8px;border:1.5px solid #2a3045" src="">
+          </div>
+
+          <!-- 2-savol variantlari -->
+          <div style="font-size:10px;color:#6b7280;font-family:'IBM Plex Mono',monospace;margin-bottom:8px">VARIANTLAR</div>
+          <div id="q2Options">
+            ${[1,2,3,4].map(i => `
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+              <input type="radio" name="q2correct" value="${i-1}" style="width:14px;height:14px;cursor:pointer">
+              <input type="text" id="q2opt${i}" placeholder="${i}-variant" style="flex:1;padding:7px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px;font-family:'Sora',sans-serif">
+            </div>`).join('')}
+          </div>
+          <p style="font-size:10px;color:#6b7280;margin-top:6px">☝️ Radiobutton — 2-savol to'g'ri javobini belgilang</p>
+        </div>
       </div>
 
       <!-- Tanlangan bo'lim ma'lumoti -->
@@ -1008,8 +1053,7 @@ async function submitQuestion(){
       testType: selectedTestType,
       difficulty: isTopik1 ? null : (diff ? diff.dataset.val : null),
       topik1Range: isTopik1 ? (selectedT1Range || null) : null,
-      groupId: isTopik1 && document.getElementById("topik1IsMulti") && document.getElementById("topik1IsMulti").checked ? ("topik1_"+selectedT1Range+"_"+Date.now()) : null,
-      groupOrder: isTopik1 && document.getElementById("topik1IsMulti") && document.getElementById("topik1IsMulti").checked ? 1 : null,
+
       topik1TemplateId: isTopik1 ? (t1Templates[selectedT1Range] && t1Templates[selectedT1Range].id ? t1Templates[selectedT1Range].id : null) : null,
       ball: isTopik1 ? (parseFloat(document.getElementById("questionBall").value) || null) : null,
       purposeTemplateId: purposeTplSel && purposeTplSel.value ? purposeTplSel.value : null,
@@ -1689,6 +1733,42 @@ function previewTopik1Sound(currentId) {
   if(!link) { alert("Avval audio yuklang!"); return; }
   var audio = new Audio(link.href);
   audio.play();
+}
+</script>
+
+
+<script>
+var topik1MultiEnabled_flag = false;
+
+function toggleTopik1Multi() {
+  topik1MultiEnabled_flag = !topik1MultiEnabled_flag;
+  var icon = document.getElementById("topik1MultiCheckIcon");
+  var box  = document.getElementById("topik1MultiCheck");
+  var q2   = document.getElementById("topik1Q2Panel");
+  if(icon) icon.style.display = topik1MultiEnabled_flag ? "block" : "none";
+  if(box)  box.style.background = topik1MultiEnabled_flag ? "rgba(39,174,96,0.2)" : "transparent";
+  if(q2)   q2.style.display = topik1MultiEnabled_flag ? "block" : "none";
+}
+
+function topik1IsMultiEnabled() {
+  return topik1MultiEnabled_flag;
+}
+
+function showQ2FileName(input, labelId) {
+  if(input.files[0]) document.getElementById(labelId).textContent = input.files[0].name;
+}
+
+function showQ2ImgPreview(input) {
+  if(input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = document.getElementById("q2ImgPreview");
+      img.src = e.target.result;
+      img.style.display = "block";
+    };
+    reader.readAsDataURL(input.files[0]);
+    document.getElementById("q2ImgName").textContent = input.files[0].name;
+  }
 }
 </script>
 
