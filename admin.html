@@ -242,6 +242,15 @@ select:focus{border-color:var(--accent)}
         <button class="tog-btn" data-range="69~70" data-type="Reading" data-ball="3" onclick="selectTopik1Section(this)">[69~70]</button>
       </div>
 
+      <!-- Guruh savol (25-26 kabi) -->
+      <div id="topik1MultiDiv" style="display:none;margin-top:12px;padding:10px 14px;background:#1e2a1e;border-radius:10px;border:1.5px solid #27ae60">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#2ecc71;font-weight:700">
+          <input type="checkbox" id="topik1IsMulti" style="width:16px;height:16px;cursor:pointer">
+          Guruh savol (25-26, 27-28 kabi) — bitta ekranda 2 savol
+        </label>
+        <p style="font-size:11px;color:#6b7280;margin:6px 0 0 26px">Bu savolni qo'shgach, keyingi savolni ham xuddi shu groupId bilan qo'shing</p>
+      </div>
+
       <!-- Tanlangan bo'lim ma'lumoti -->
       <div id="topik1SectionInfo" style="display:none;margin-top:16px;background:#1e2330;border-radius:12px;padding:14px 16px;border:1.5px solid #2a3045">
         <div id="topik1SectionText" style="font-size:12px;color:#a0aec0;font-family:'IBM Plex Mono',monospace;margin-bottom:10px;line-height:1.6"></div>
@@ -999,6 +1008,8 @@ async function submitQuestion(){
       testType: selectedTestType,
       difficulty: isTopik1 ? null : (diff ? diff.dataset.val : null),
       topik1Range: isTopik1 ? (selectedT1Range || null) : null,
+      groupId: isTopik1 && document.getElementById("topik1IsMulti") && document.getElementById("topik1IsMulti").checked ? ("topik1_"+selectedT1Range+"_"+Date.now()) : null,
+      groupOrder: isTopik1 && document.getElementById("topik1IsMulti") && document.getElementById("topik1IsMulti").checked ? 1 : null,
       topik1TemplateId: isTopik1 ? (t1Templates[selectedT1Range] && t1Templates[selectedT1Range].id ? t1Templates[selectedT1Range].id : null) : null,
       ball: isTopik1 ? (parseFloat(document.getElementById("questionBall").value) || null) : null,
       purposeTemplateId: purposeTplSel && purposeTplSel.value ? purposeTplSel.value : null,
@@ -1540,6 +1551,13 @@ function selectTopik1Section(btn) {
   var ballInput = document.getElementById("questionBall");
   if(ballInput) ballInput.value = ball;
   
+  // Guruh savol checkbox
+  var multiRanges = ["25~26","27~28","29~30","49~50","51~52","53~54","55~56","57~58","59~60","61~62","63~64","65~66","67~68","69~70"];
+  var multiDiv = document.getElementById("topik1MultiDiv");
+  var multiCheck = document.getElementById("topik1IsMulti");
+  if(multiDiv) multiDiv.style.display = multiRanges.indexOf(range) >= 0 ? "block" : "none";
+  if(multiCheck) multiCheck.checked = false;
+
   // Bo'lim ma'lumoti
   var info = document.getElementById("topik1SectionInfo");
   var textEl = document.getElementById("topik1SectionText");
