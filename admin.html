@@ -356,6 +356,44 @@ select:focus{border-color:var(--accent)}
     <audio id="tapSoundPreview" style="display:none;width:100%;margin-top:10px" controls></audio>
   </div>
 
+  <!-- TOPIK 1 bo'lim o'tish signali -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+    <div style="font-size:14px;font-weight:800;margin-bottom:4px">🔔 TOPIK 1 — Bo'lim o'tish signali</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;font-family:'IBM Plex Mono',monospace">
+      [1~4] → [5~6] kabi bo'limdan bo'limga o'tganda chalinadigan signal ovozi
+    </div>
+    <div id="sectionSignalCurrent" style="font-size:12px;color:var(--muted);margin-bottom:12px">⏳ Yuklanmoqda...</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <label class="upload-btn">🎧 MP3 yuklash<input type="file" id="sectionSignalFile" accept="audio/*" onchange="showFileName('sectionSignalFile','sectionSignalName')"></label>
+      <div id="sectionSignalName" style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace"></div>
+    </div>
+    <div id="sectionSignalStatus" style="font-size:13px;min-height:18px;padding:8px 0"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="saveTopik1Sound('sectionChangeSound','sectionSignalFile','sectionSignalStatus','sectionSignalCurrent')" class="btn btn-blue">💾 Saqlash</button>
+      <button onclick="previewTopik1Sound('sectionSignalCurrent')" style="padding:8px 18px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer">▶ Tinglash</button>
+    </div>
+    <audio id="sectionSignalPreview" style="display:none;width:100%;margin-top:10px" controls></audio>
+  </div>
+
+  <!-- TOPIK 1 다시 들으십시오 -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+    <div style="font-size:14px;font-weight:800;margin-bottom:4px">🔁 TOPIK 1 — 다시 들으십시오</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;font-family:'IBM Plex Mono',monospace">
+      Savol birinchi marta o'qilgach, ikkinchi marta o'qilishi oldidan chalinadigan ovoz
+    </div>
+    <div id="repeatSoundCurrent" style="font-size:12px;color:var(--muted);margin-bottom:12px">⏳ Yuklanmoqda...</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <label class="upload-btn">🎧 MP3 yuklash<input type="file" id="repeatSoundFile" accept="audio/*" onchange="showFileName('repeatSoundFile','repeatSoundName')"></label>
+      <div id="repeatSoundName" style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace"></div>
+    </div>
+    <div id="repeatSoundStatus" style="font-size:13px;min-height:18px;padding:8px 0"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="saveTopik1Sound('repeatSound','repeatSoundFile','repeatSoundStatus','repeatSoundCurrent')" class="btn btn-blue">💾 Saqlash</button>
+      <button onclick="previewTopik1Sound('repeatSoundCurrent')" style="padding:8px 18px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer">▶ Tinglash</button>
+    </div>
+    <audio id="repeatSoundPreview" style="display:none;width:100%;margin-top:10px" controls></audio>
+  </div>
+
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
     <div style="font-size:14px;font-weight:800;margin-bottom:16px">➕ Yangi audio shablon qo'shish</div>
     <div class="field">
@@ -1560,5 +1598,81 @@ function showTab(tab){
   if(tab==="topik1"&&typeof loadTopik1Templates==="function")loadTopik1Templates();
 }
 </script>
+
+<script>
+// ── TOPIK 1 maxsus audio signallari ──
+var topik1SoundUrls = {};
+
+// Sahifa yuklanganda mavjud URLlarni o'qiymiz
+db.collection("appSettings").doc("topik1Audio").get().then(function(snap) {
+  if(snap.exists) {
+    var d = snap.data();
+    topik1SoundUrls = d;
+
+    if(d.sectionChangeSound) {
+      document.getElementById("sectionSignalCurrent").innerHTML =
+        '<a href="'+d.sectionChangeSound+'" target="_blank" style="color:var(--accent)">🔊 Mavjud fayl</a>';
+    } else {
+      document.getElementById("sectionSignalCurrent").textContent = "Yuklanmagan";
+    }
+
+    if(d.repeatSound) {
+      document.getElementById("repeatSoundCurrent").innerHTML =
+        '<a href="'+d.repeatSound+'" target="_blank" style="color:var(--accent)">🔊 Mavjud fayl</a>';
+    } else {
+      document.getElementById("repeatSoundCurrent").textContent = "Yuklanmagan";
+    }
+  } else {
+    document.getElementById("sectionSignalCurrent").textContent = "Yuklanmagan";
+    document.getElementById("repeatSoundCurrent").textContent = "Yuklanmagan";
+  }
+}).catch(function() {
+  document.getElementById("sectionSignalCurrent").textContent = "Yuklanmagan";
+  document.getElementById("repeatSoundCurrent").textContent = "Yuklanmagan";
+});
+
+function showFileName(inputId, labelId) {
+  var f = document.getElementById(inputId).files[0];
+  if(f) document.getElementById(labelId).textContent = f.name;
+}
+
+async function saveTopik1Sound(fieldName, fileInputId, statusId, currentId) {
+  var file = document.getElementById(fileInputId).files[0];
+  var statusEl = document.getElementById(statusId);
+  if(!file) { statusEl.textContent = "❌ Fayl tanlanmagan!"; return; }
+
+  statusEl.style.color = "var(--muted)";
+  statusEl.textContent = "⏳ Yuklanmoqda...";
+
+  try {
+    var ext = file.name.split(".").pop() || "mp3";
+    var ref = storage.ref("topik1/signals/" + fieldName + "." + ext);
+    await ref.put(file);
+    var url = await ref.getDownloadURL();
+
+    var data = {};
+    data[fieldName] = url;
+    await db.collection("appSettings").doc("topik1Audio").set(data, { merge: true });
+
+    topik1SoundUrls[fieldName] = url;
+    statusEl.style.color = "#2ecc71";
+    statusEl.textContent = "✅ Saqlandi!";
+    document.getElementById(currentId).innerHTML =
+      '<a href="'+url+'" target="_blank" style="color:var(--accent)">🔊 Mavjud fayl</a>';
+  } catch(e) {
+    statusEl.style.color = "#e74c3c";
+    statusEl.textContent = "❌ Xato: " + e.message;
+  }
+}
+
+function previewTopik1Sound(currentId) {
+  var el = document.getElementById(currentId);
+  var link = el.querySelector("a");
+  if(!link) { alert("Avval audio yuklang!"); return; }
+  var audio = new Audio(link.href);
+  audio.play();
+}
+</script>
+
 </body>
 </html>
